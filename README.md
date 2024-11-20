@@ -5,11 +5,16 @@
 |1| v0.1.0 | Initial release |2024/11/20|
 
 ## Table of contents
+* [TODO](#todo)
 * [Introduction](#introduction)
 * [Requirements](#requirements)
 * [What is this Crate?](#what-is-this-crate)
 * [How to use it?](#how-to-use-it)
-
+## TODO
+- [x] Create specification
+- [ ] Create Directory
+- [ ] Create Cargo.toml
+- [ ] Create main.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.
 I had try to make it third time.This time I will try to make it better.
