@@ -1,6 +1,20 @@
 # Sunny web server
+
+|No.| Version | Description |Date |
+|---|---|---|---|
+|1| v0.1.0 | Initial release |2024/11/20|
+
+## Table of contents
+* [Introduction](#introduction)
+* [Requirements](#requirements)
+* [What is this Crate?](#what-is-this-crate)
+* [How to use it?](#how-to-use-it)
+
+## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.
 I had try to make it third time.This time I will try to make it better.
+## Requirements
+    Rust 、HTML5、CSS3、JavaScript
 
 ## What is this Crate?
 It is a simple web server.
@@ -11,3 +25,4 @@ Yeap,It is a specification.
 It is a technique supported by some model-view-controller frameworks, in which the programmer may write a specification that describes how the application database may be used. The compiler uses this specification to generate code that the application can use to create, read, update and delete database entries, effectively treating the template as a "scaffold" on which to build a more powerful application.
 
 ## How to use it?
+1.Install rust.
