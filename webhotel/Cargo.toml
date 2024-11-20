@@ -1,0 +1,21 @@
+[package]
+name = "webhotel"
+version = "0.1.1"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "webhotel is a web framework."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+askama = "0.11"
+axum = "0.6"
+axum-extra = { version = "0.4.2", features = ["spa"] }
+config = "0.13"
+dotenv = "0.15"
+serde = { version="1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1.25", features = ["full"] }
+tower-http = { version = "0.3.5", features = ["fs", "trace"] }
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

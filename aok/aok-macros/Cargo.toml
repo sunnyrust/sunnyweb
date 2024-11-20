@@ -1,0 +1,30 @@
+[package]
+name = "aok-macros"
+version = "0.1.0"
+edition = "2021"
+license = "BSD-3-Clause"
+description = "A collection of procedural macros for Aok"
+keywords = ["orm", "postgres", "mssql", "mysql", "sqlite"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "^1.0", features = ["extra-traits"] }
+log = "^0.4"
+sqlx = "0.6"
+quote = "^1.0"
+proc-macro2 = "1"
+
+[features]
+"default" = []
+"postgres" = ["sqlx/postgres"]
+"mysql" = ["sqlx/mysql"]
+"mssql" = ["sqlx/mssql"]
+"sqlite" = ["sqlx/sqlite"]
+[dev-dependencies]
+async-std = { version = "1", features = ["attributes"] }
+sqlx = { version = "0.6", features = [ "runtime-async-std-rustls",  "macros"] }
+aok-macros = { path="./", features=["postgres", "mysql", "mssql", "sqlite"] }

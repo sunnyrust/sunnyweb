@@ -1,0 +1,6 @@
+[workspace]
+default-members = ["aok-macros","aok-bin","aok"]
+members = ["aok-macros","aok-bin","aok"]
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3
