@@ -1,3 +1,4 @@
+pub mod menu;
 use std::fs;
 use serde::{Deserialize, Serialize};
 use std::fs::{ OpenOptions};
@@ -41,6 +42,7 @@ pub(crate) fn create_main_rs(path:String)-> std::io::Result<()>{
     }
     "#;
     buffer.write(str_main.as_bytes())?;
+    Ok(())
 }
 // pub(crate) fn create_main(path:String)-> std::io::Result<()>{
 //     let mut buffer = OpenOptions::new()
