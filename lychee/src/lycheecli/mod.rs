@@ -1,25 +1,40 @@
 pub mod menu;
+pub mod utils;
 use std::fs;
 use serde::{Deserialize, Serialize};
 use std::fs::{ OpenOptions};
 use std::io::{Write};
-#[derive(Serialize, Deserialize)]
-#[derive(Debug)]
+
+#[derive(Clone,Debug,Serialize, Deserialize)]
+/// Cargo.toml necessary element
 pub struct Cargo { 
      pub name : String,
      pub version :String,
      pub authors : String,
      pub edition : String,
 }
-#[derive(Serialize, Deserialize)]
-#[derive(Debug)]
-/// Vulcan 项目需要的元素
-pub struct VulcanProject{
-    pub project_name:String,
-    pub project_edition:String
+
+impl Cargo {
+  pub fn new(name:String, authors:String, edition:String) -> Self {
+    Cargo { name, authors,version:"0.1.0".to_string(), edition }
+  }
+  pub fn create_cargo_toml(&self,path:String){
+      let _=create_cargo_toml(self.clone(),path);
+  }
+  pub fn mkdir(&self){
+      mkdir(self.name.as_str());
+  }
+} 
+/// Check if the specified path is an existing directory
+pub(crate) fn dir_exists(path: &str) -> bool {
+  fs::metadata(path).map_or(false, |m| m.is_dir())
 }
-/// 创建目录
+/// create dir
 pub(crate)  fn mkdir(path:&str){
+    if dir_exists(path) {
+      tracing::error!("Directory is exists: {}", path);
+      std::process::exit(1);
+    } 
     let r = fs::create_dir_all(path);
     match r {
         Err(e) => {

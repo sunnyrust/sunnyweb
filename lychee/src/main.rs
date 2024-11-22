@@ -1,4 +1,5 @@
 pub mod lycheecli;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use crate::lycheecli::menu;
 fn logo(){
     eprintln!(r#"
@@ -21,6 +22,14 @@ fn logo(){
        "#);
 }
 fn main() {
- logo();
- menu::new_menu();
+    tracing_subscriber::registry()
+    .with(
+        tracing_subscriber::EnvFilter::try_from_default_env()
+            .unwrap_or_else(|_| "lychee=debug".into()),  //,tower_http=debug
+    ).with(tracing_subscriber::fmt::layer())
+    .init();
+
+
+    logo();
+    menu::new_menu();
 }

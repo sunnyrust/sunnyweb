@@ -1,8 +1,9 @@
 use std::fs;
-use crate::lycheecli::*;
+use crate::lycheecli;
+use crate::lycheecli::{utils::*,*};
 // use aok::connection::Connection;
 use clap::{Arg,Parser, Command, Subcommand};
-
+use std::{thread, time};
 // use tokio::runtime::Runtime;
 
 #[derive(Parser)]
@@ -16,14 +17,20 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     
-    #[clap(about = "Create a new web App. \nExample: \n\tlycheecli new --name=lychee --version=0.1.0")]
+    #[clap(about = "Create a new web App. \nExample: \n\tlycheecli new --name=lychee --authors=\"[jinheking@163.com]\" --version=0.1.0")]
     New {
         #[arg(short, long,default_value = "sunny-web")]
         name: String,
+        #[arg(short, long,default_value = "[jinheking@163.com]")]
+        authors: String,
         #[arg(short, long,default_value = "2021")]
-        version: String,
+        edition: String,
     },
-    
+    #[clap(about = "Drop a  web App. \nExample: \n\tlycheecli drop --name=lychee")]
+    Drop{
+        #[arg(short, long,default_value = "sunny-web")]
+        name:String,
+    },
     /// List all databases
     List,
 }
@@ -32,42 +39,39 @@ pub fn new_menu(){
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::New { name,version } => {
-            println!("Creating web App: {} verson:{}", name,version);
+        Commands::New { name,authors,edition} => {
+            println!("Creating web App: {}\t author:{}\t edition:{}", name,authors,edition);
+            // let lychee=LycheeProject{
+            //     name:name.to_string(),
+            //     author:author.to_string(),
+            //     edition:edition.to_string()
+            // };
+            let millis = time::Duration::from_millis(300);
+    
+            let lychee_project=Cargo::new(name.to_string(),authors.to_string(),edition.to_string());
+            println!("{:?}",lychee_project); 
+            lychee_project.mkdir();  
+            thread::sleep(millis);  
+            let project_name=lychee_project.name; 
+            let cargo_toml_path=project_name.to_string()+"/Cargo.toml";
+            let dir_name=project_name.to_string()+"/src";
+            
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            let dir_name=project_name.to_string()+"/static/Css";
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+        }
+        Commands::Drop { name } => {
+            let dir_name=name.to_string()+"/";
+            if dir_exists(&dir_name){
+                utils::remove_dir(&dir_name).expect("remove dir failed");
+            }
+            println!("Drop a web app {}",name);
         }
         Commands::List => {
             println!("Listing all web app");
         }
     }
 
-}
-pub fn menu() {
-    let matches = Command::new("Lychee")
-        .version("0.1.0")
-        .author("Your Name <jinheking@163.com>")
-        .about("A CLI tool for scaffold")
-        .subcommand_required(true)
-        .arg_required_else_help(true)
-        .subcommand(
-            Command::new("new ")
-                .about("Create a new web server")
-                .arg(Arg::new("name").short('n').long("name").required(true)),
-        )
-        .subcommand(
-            Command::new("list")
-                .about("List this web App"),
-        )
-        .get_matches();
-        // let runtime = Runtime::new().expect("Can not create Tokio runtime");
-    match matches.subcommand() {
-        Some(("create", sub_matches)) => {
-            let name = sub_matches.get_one::<String>("name").expect("name is required");
-            println!("Web App name: {}", name);
-        }
-        Some(("list", _)) => {
-            println!("List this web App");
-            // list_databases(&CFG.app.database_path);
-        }
-        _ => unreachable!(), // We have set subcommand_required(true) so this case should never happen
-    }
 }
