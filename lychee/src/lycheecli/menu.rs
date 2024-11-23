@@ -17,11 +17,11 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     
-    #[clap(about = "Create a new web App. \nExample: \n\tlycheecli new --name=lychee --authors=\"[jinheking@163.com]\" --version=0.1.0")]
+    #[clap(about = "Create a new web App. \nExample: \n\tlycheecli new --name=lychee --authors=[\"jinheking@163.com\"] --version=0.1.0")]
     New {
         #[arg(short, long,default_value = "sunny-web")]
         name: String,
-        #[arg(short, long,default_value = "[jinheking@163.com]")]
+        #[arg(short, long,default_value = "[\"jinheking@163.com\"]")]
         authors: String,
         #[arg(short, long,default_value = "2021")]
         edition: String,
@@ -57,9 +57,18 @@ pub fn new_menu(){
             // create cargo_toml_path file
             let _=lychee_project.create_cargo_toml(cargo_toml_path.clone().to_string());
             thread::sleep(millis);
+            // create README.md
+            let readme_path=project_name.to_string()+"/README.md";
+            let _=lychee_project.create_readme(readme_path.to_string());
+            thread::sleep(millis);
+            
             // create directorys
             let mut dir_name=project_name.to_string()+"/src";
             lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            // create main.rs
+            dir_name=project_name.to_string()+"/src/main.rs";
+            create_file_from_template(dir_name,"./resource/main.template".to_string());
             thread::sleep(millis);
             dir_name=project_name.to_string()+"/static/Css";
             lycheecli::mkdir(&dir_name);

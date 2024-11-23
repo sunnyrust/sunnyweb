@@ -14,7 +14,9 @@
 - [x] Create specification
 - [x] Create Directory
 - [x] Create Cargo.toml
-- [ ] Create main.rs
+- [x] Create main.rs
+- [x] Create README.md
+- [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.
 I had try to make it third time.This time I will try to make it better.
