@@ -52,13 +52,31 @@ pub fn new_menu(){
             println!("{:?}",lychee_project); 
             lychee_project.mkdir();  
             thread::sleep(millis);  
-            let project_name=lychee_project.name; 
+            let project_name=lychee_project.clone().name; 
             let cargo_toml_path=project_name.to_string()+"/Cargo.toml";
-            let dir_name=project_name.to_string()+"/src";
-            
+            // create cargo_toml_path file
+            let _=lychee_project.create_cargo_toml(cargo_toml_path.clone().to_string());
+            thread::sleep(millis);
+            // create directorys
+            let mut dir_name=project_name.to_string()+"/src";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
-            let dir_name=project_name.to_string()+"/static/Css";
+            dir_name=project_name.to_string()+"/static/Css";
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            dir_name=project_name.to_string()+"/static/Images";
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            dir_name=project_name.to_string()+"/static/Js";
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            dir_name=project_name.to_string()+"/templates";
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            dir_name=project_name.to_string()+"/src/controller";
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            dir_name=project_name.to_string()+"/src/model";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
         }

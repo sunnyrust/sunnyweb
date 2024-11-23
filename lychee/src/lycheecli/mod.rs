@@ -18,11 +18,12 @@ impl Cargo {
   pub fn new(name:String, authors:String, edition:String) -> Self {
     Cargo { name, authors,version:"0.1.0".to_string(), edition }
   }
-  pub fn create_cargo_toml(&self,path:String){
-      let _=create_cargo_toml(self.clone(),path);
-  }
+
   pub fn mkdir(&self){
       mkdir(self.name.as_str());
+  }
+  pub fn create_cargo_toml(&self,path:String)-> std::io::Result<()>{
+      Ok(create_cargo_toml(self.clone(),path)?)
   }
 } 
 /// Check if the specified path is an existing directory
@@ -59,49 +60,6 @@ pub(crate) fn create_main_rs(path:String)-> std::io::Result<()>{
     buffer.write(str_main.as_bytes())?;
     Ok(())
 }
-// pub(crate) fn create_main(path:String)-> std::io::Result<()>{
-//     let mut buffer = OpenOptions::new()
-//     .read(true)
-//     .write(true)
-//     .create(true)
-//     .open(&path).unwrap();
-//     let str_main=r#"use actix_files::Files;
-// use actix_web::{middleware, web, App, HttpResponse, HttpServer, Responder};
-// use tera::Tera;
-// use vulcan_salute::web::*;
-// mod controllers;
-// use controllers::index::Index;
-// async fn hello() -> impl Responder {
-//     HttpResponse::Ok().body("Hello vulcan salute!\nLive long and prosper! \nPeace and long life")
-// }
-
-// #[actix_web::main]
-// async fn main() -> std::io::Result<()> {
-//     std::env::set_var("RUST_LOG", "actix_web=info");
-//     env_logger::init();
-//     let url = "0.0.0.0:9728";
-//     println!("Listening on: {}, open browser and visit have a try!", url);
-//     HttpServer::new(|| {
-//         let tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")).unwrap();
-//         App::new()
-//         .data(tera)
-//         .wrap(middleware::Logger::default()) // enable logger
-//         .service(Files::new("/static", "static/"))
-//         .service(web::resource("/").route(web::get().to(Index::index)))
-//         .service(web::resource("/hello").route(web::get().to(hello)))
-//         .service(web::scope("").wrap(web_error::error_handlers()))
-//     })
-//     .bind(url)?
-//     .run()
-//     .await
-// }
-
-// "#;
-//     buffer.write(str_main.as_bytes())?;
-//     println!("main.rs created.👌");
-//     buffer.flush()?;
-//     Ok(())
-// }
 
 /// create Cargo.toml
 pub(crate) fn create_cargo_toml(cargo: crate::lycheecli::Cargo,path:String)-> std::io::Result<()>{
@@ -114,38 +72,27 @@ pub(crate) fn create_cargo_toml(cargo: crate::lycheecli::Cargo,path:String)-> st
 
     buffer.write(b"[package]")?;
     buffer.write(b"\n")?;
+    let mut str_package=r#"name = ""#;
+    buffer.write(str_package.as_bytes())?;
     buffer.write(cargo.name.trim().as_bytes())?;
-    buffer.write(b"\n")?;
+    buffer.write(b"\"\n")?;
+    str_package=r#"version = ""#;
+    buffer.write(str_package.as_bytes())?;
     buffer.write(cargo.version.trim().as_bytes())?;
-    buffer.write(b"\n")?;
-
+    buffer.write(b"\"\n")?;
+    str_package=r#"authors = ""#;
+    buffer.write(str_package.as_bytes())?;
     buffer.write(cargo.authors.trim().as_bytes())?;
-    buffer.write(b"\n")?;
+    buffer.write(b"\"\n")?;
+    str_package=r#"edition = ""#;
+    buffer.write(str_package.as_bytes())?;
     buffer.write(cargo.edition.trim().as_bytes())?;
-    buffer.write(b"\n\n")?;
+    buffer.write(b"\"\n\n")?;
 
     buffer.write(r"# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html".as_bytes())?;
     buffer.write(b"\n\n")?;
-    buffer.write(b"[dependencies]")?;
-    buffer.write(b"\n")?;
-    buffer.write(br#"actix-files = "0.5.0""#)?;
-    buffer.write(b"\n")?;
-    buffer.write(br#"tera = "1.8.0""#)?;
-    buffer.write(b"\n")?;
-    buffer.write(br#"actix-http = "2""#)?;
-    buffer.write(b"\n")?;
-    buffer.write(br#"actix-web = "3""#)?;
-    buffer.write(b"\n")?;
-    buffer.write(br#"env_logger = "0.8""#)?;
-    buffer.write(b"\n\n")?;
-
-    buffer.write(r#"[dependencies.vulcan_salute]"#.as_bytes())?;
-    buffer.write(b"\n")?;
-    buffer.write(r#"git = "https://github.com/sunnyrust/vulcan_salute.git""#.as_bytes())?;
-    buffer.write(b"\n")?;
-    buffer.write(r#"branch = "main""#.as_bytes())?;
-    buffer.write(b"\n")?;
-
+    let content = include_str!("../../resource/Cargo.template");
+    buffer.write(content.as_bytes())?;
     println!("Cargo.toml created.👌");
     buffer.flush()?;
 

@@ -12,8 +12,8 @@
 * [How to use it?](#how-to-use-it)
 ## TODO
 - [x] Create specification
-- [ ] Create Directory
-- [ ] Create Cargo.toml
+- [x] Create Directory
+- [x] Create Cargo.toml
 - [ ] Create main.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.
