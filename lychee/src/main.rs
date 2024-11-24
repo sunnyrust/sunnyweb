@@ -1,4 +1,4 @@
-pub mod lycheecli;
+use lychee::*;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use crate::lycheecli::menu;
 fn logo(){
@@ -29,7 +29,7 @@ fn main() {
     ).with(tracing_subscriber::fmt::layer())
     .init();
 
-
     logo();
+
     menu::new_menu();
 }

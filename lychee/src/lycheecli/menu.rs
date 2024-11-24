@@ -17,7 +17,7 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     
-    #[clap(about = "Create a new web App. \nExample: \n\tlycheecli new --name=lychee --authors=[\"jinheking@163.com\"] --version=0.1.0")]
+    #[clap(about = "Create a new web App. \nExample: \n\tlycheecli new --name=lychee --authors=[\"jinheking@163.com\"] --edition=2021")]
     New {
         #[arg(short, long,default_value = "sunny-web")]
         name: String,
@@ -41,11 +41,16 @@ pub fn new_menu(){
     match &cli.command {
         Commands::New { name,authors,edition} => {
             println!("Creating web App: {}\t author:{}\t edition:{}", name,authors,edition);
-            // let lychee=LycheeProject{
-            //     name:name.to_string(),
-            //     author:author.to_string(),
-            //     edition:edition.to_string()
-            // };
+            // 判断edition 是不是合格
+            let cfg=&crate::CFG;
+            // tracing::info!("cfg:{:?}",cfg.app.edition);
+            if cfg.app.edition.contains(&edition) {
+                // 你的逻辑代码
+                tracing::info!("Edition {} is supported", edition);
+            } else {
+                tracing::error!("Edition {} is not supported", edition);
+                std::process::exit(0);
+            }
             let millis = time::Duration::from_millis(300);
     
             let lychee_project=Cargo::new(name.to_string(),authors.to_string(),edition.to_string());
@@ -68,7 +73,7 @@ pub fn new_menu(){
             thread::sleep(millis);
             // create main.rs
             dir_name=project_name.to_string()+"/src/main.rs";
-            create_file_from_template(dir_name,"./resource/main.template".to_string());
+            let _=create_file_from_template(dir_name,"./resource/main.template".to_string());
             thread::sleep(millis);
             dir_name=project_name.to_string()+"/static/Css";
             lycheecli::mkdir(&dir_name);

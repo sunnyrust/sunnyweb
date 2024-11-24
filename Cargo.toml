@@ -4,5 +4,4 @@ version = "0.1.0"
 members = [
     "lychee",
     "webhotel",
-    "lychee/sunny-web",
 ]
