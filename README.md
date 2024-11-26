@@ -16,7 +16,10 @@
 - [x] Create Cargo.toml
 - [x] Create main.rs
 - [x] Create README.md
-- [ ] Create config.rs
+- [x] Determine if the edition is in the right format.
+- [x] Create configs and app.toml.
+- [x] Create config.rs
+- [x] Create lib.rs
 - [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.

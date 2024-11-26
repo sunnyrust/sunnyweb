@@ -5,6 +5,7 @@ use std::fs;
 use serde::{Deserialize, Serialize};
 use std::fs::{ OpenOptions};
 use std::io::{Write};
+use crate::lycheecli::utils::*;
 
 #[derive(Clone,Debug,Serialize, Deserialize)]
 /// Cargo.toml necessary element
@@ -51,17 +52,7 @@ pub(crate)  fn mkdir(path:&str){
     }
 }
 
-/// create file from template
-pub(crate) fn create_file_from_template(path:String,template:String)-> std::io::Result<()>{
-    let mut buffer = OpenOptions::new()
-    .read(true)
-    .write(true)
-    .create(true)
-    .open(&path).unwrap();
-    let content = fs::read_to_string(&template).expect("Failed to read file");
-    buffer.write(content.as_bytes())?;
-    Ok(())
-}
+
 
 /// create  README.md
 pub(crate) fn create_readme(cargo: crate::lycheecli::Cargo,path:String)-> std::io::Result<()>{
@@ -111,26 +102,13 @@ pub(crate) fn create_cargo_toml(cargo: crate::lycheecli::Cargo,path:String)-> st
     buffer.write(b"\n\n")?;
     let content = include_str!("../../resource/Cargo.template");
     buffer.write(content.as_bytes())?;
-    println!("Cargo.toml created.👌");
-    buffer.flush()?;
-
-    Ok(())
-}
-/// create file
-pub(crate)  fn create_file(path:String,body: &[u8],msg:String)-> std::io::Result<()>{
-    let mut buffer = OpenOptions::new()
-    .read(true)
-    .write(true)
-    .create(true)
-    .open(&path).unwrap();
-
-    buffer.write_all(body)?;
-    println!("{}",msg);
+    println!("Create  Cargo.toml created.👌");
     buffer.flush()?;
 
     Ok(())
 }
 
+#[allow(dead_code)]
 /// ceate index controller
 pub(crate) fn create_index_controller(path:String)-> std::io::Result<()>{
     let body=br#"use std::collections::HashMap;
@@ -161,6 +139,6 @@ impl Index {
 }
 "#;
     let msg=String::from("Index controller created.👌");
-    let _result=self::create_file(path, body,msg);
+    let _result=create_file(path, body,msg);
     Ok(())
 }
