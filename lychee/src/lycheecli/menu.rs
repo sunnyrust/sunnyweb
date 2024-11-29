@@ -72,9 +72,15 @@ pub fn new_menu(){
             thread::sleep(millis);
             // create main.rs
             dir_name=project_name.to_string()+"/src/main.rs";
-            match create_file_from_template(dir_name,"./resource/main.rs.template".to_string()){
-                Ok(_)=>println!("Create  main.rs successfully.👌"),
-                Err(e)=>println!("{}",e)
+            if check_file_exists("./resource/main.rs.template"){
+                match create_file_from_template(dir_name,"./resource/main.rs.template".to_string()){
+                    Ok(_)=>println!("Create  main.rs successfully.👌"),
+                    Err(e)=>println!("{}",e)
+                }
+            }else{
+                let app = get_app_default().unwrap();
+                let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let _=create_file_from_str(dir_name,content.as_bytes(),"Create  main.rs successfully.👌".to_string());
             }
             thread::sleep(millis);
             dir_name=project_name.to_string()+"/static/Css";
@@ -95,23 +101,44 @@ pub fn new_menu(){
             thread::sleep(millis);
             // create app.toml
             dir_name=project_name.to_string()+"/configs/app.toml";
-            let _=create_file_from_template(dir_name,"./resource/app.toml.template".to_string());
+            if check_file_exists("./resource/app.toml.template"){
+                let _=create_file_from_template(dir_name,"./resource/app.toml.template".to_string());
+            }else{
+                let app = get_app_default().unwrap();
+                let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let _=create_file_from_str(dir_name,content.as_bytes(),"Create  app.toml successfully.👌".to_string());
+            }
+            
             thread::sleep(millis);
             //create config.rs
-            match copy_file("./resource/config.rs.template",project_name.to_string()+"/src/config.rs"){
-                Ok(_) => println!("Create  config.rs successfully.👌"),
-                Err(e) => {
-                    eprintln!("Error copying file: {}", e);
-                    std::process::exit(0);
-                },
+            dir_name="./resource/config.rs.template".to_string();
+            if check_file_exists(&dir_name){
+                match copy_file(&dir_name,project_name.to_string()+"/src/config.rs"){
+                    Ok(_) => println!("Create  config.rs successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying file: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            }else{
+                let app = get_config_default().unwrap();
+                let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let _=create_file_from_str(project_name.to_string()+"/src/config.rs",content.as_bytes(),"Create  config.rs successfully.👌".to_string());
             }
             // create lib.rs
-            match copy_file("./resource/main_lib.rs.template",project_name.to_string()+"/src/lib.rs"){
-                Ok(_) => println!("Create  configlib.rs  successfully.👌"),
-                Err(e) => {
-                    eprintln!("Error copying file: {}", e);
-                    std::process::exit(0);
-                },
+            dir_name="./resource/main_lib.rs.template".to_string();
+            if check_file_exists(&dir_name){
+                match copy_file(&dir_name,project_name.to_string()+"/src/lib.rs"){
+                    Ok(_) => println!("Create  lib.rs  successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying file: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            }else{
+                let app = get_main_lib_default().unwrap();
+                let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let _=create_file_from_str(project_name.to_string()+"/src/lib.rs",content.as_bytes(),"Create  lib.rs successfully.👌".to_string());
             }
             // create controller directory
             dir_name=project_name.to_string()+"/src/controller";

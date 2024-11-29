@@ -5,7 +5,7 @@ use std::fs;
 use serde::{Deserialize, Serialize};
 use std::fs::{ OpenOptions};
 use std::io::{Write};
-use crate::lycheecli::utils::*;
+use crate::{lycheecli::utils::*,resources::embed_resources::*};
 
 #[derive(Clone,Debug,Serialize, Deserialize)]
 /// Cargo.toml necessary element
@@ -100,8 +100,16 @@ pub(crate) fn create_cargo_toml(cargo: crate::lycheecli::Cargo,path:String)-> st
 
     buffer.write(r"# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html".as_bytes())?;
     buffer.write(b"\n\n")?;
-    let content = include_str!("../../resource/Cargo.template");
-    buffer.write(content.as_bytes())?;
+    // let content = include_str!("../../resource/Cargo.template");
+    //if  std::path::Path::new("./resource/Cargo.template").exists() {
+    if    check_file_exists("./resource/Cargo.template"){
+        let content = include_str!("../../resource/Cargo.template");
+        buffer.write(content.as_bytes())?;
+    }else{
+        let app = get_app_cargo_default().unwrap();
+        let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+        buffer.write(content.as_bytes())?;
+    }
     println!("Create  Cargo.toml created.👌");
     buffer.flush()?;
 
@@ -139,6 +147,6 @@ impl Index {
 }
 "#;
     let msg=String::from("Index controller created.👌");
-    let _result=create_file(path, body,msg);
+    let _result=create_file_from_str(path, body,msg);
     Ok(())
 }

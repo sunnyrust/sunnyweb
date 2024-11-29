@@ -32,7 +32,7 @@ pub(crate) fn copy_file(src: &str, dest: String) -> io::Result<()> {
     Ok(())
 }
 /// create file
-pub(crate)  fn create_file(path:String,body: &[u8],msg:String)-> std::io::Result<()>{
+pub(crate)  fn create_file_from_str(path:String,body: &[u8],msg:String)-> std::io::Result<()>{
     let mut buffer = OpenOptions::new()
     .read(true)
     .write(true)
