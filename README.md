@@ -20,6 +20,7 @@
 - [x] Create configs and app.toml.
 - [x] Create config.rs
 - [x] Create lib.rs
+- [x] Loads template files into the rust binary
 - [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.

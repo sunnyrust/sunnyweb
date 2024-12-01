@@ -1,6 +1,7 @@
 use lychee::*;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use crate::lycheecli::menu;
+// mod git_version;
 fn logo(){
 //     eprintln!(r#"
 //     __                         __                              _          __     
@@ -31,6 +32,9 @@ fn logo(){
    "#,"1.0");
 }
 fn main() {
+    if let Some(timestamp) = option_env!("VERGEN_BUILD_TIMESTAMP") {
+         println!("Build Timestamp: {timestamp}");
+    }
     tracing_subscriber::registry()
     .with(
         tracing_subscriber::EnvFilter::try_from_default_env()

@@ -18,6 +18,10 @@ pub fn get_app_default() -> Option<rust_embed::EmbeddedFile> {
 pub fn get_config_default() -> Option<rust_embed::EmbeddedFile> {
     Asset::get("config.rs.template")
 }
+/// get err.rs
+pub fn get_err_default() -> Option<rust_embed::EmbeddedFile> {
+    Asset::get("err.rs.template")
+}
 /// get lib.rs
 pub fn get_main_lib_default() -> Option<rust_embed::EmbeddedFile> {
     Asset::get("main_lib.rs.template")

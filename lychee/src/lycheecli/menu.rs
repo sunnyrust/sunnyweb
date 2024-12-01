@@ -3,11 +3,14 @@ use crate::lycheecli::{utils::*,*};
 // use aok::connection::Connection;
 use clap::{Parser,  Subcommand};
 use std::{thread, time};
+
 // use tokio::runtime::Runtime;
 
 #[derive(Parser)]
 #[command(name = "lycheecli")]
 #[command(about = "A command-line interface for managing databases", long_about = None)]
+#[command(author="Sunny Region", version= crate::GIT_VERSION,  long_about = None)]
+
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -78,7 +81,7 @@ pub fn new_menu(){
                     Err(e)=>println!("{}",e)
                 }
             }else{
-                let app = get_app_default().unwrap();
+                let app = get_main_default().unwrap();
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
                 let _=create_file_from_str(dir_name,content.as_bytes(),"Create  main.rs successfully.👌".to_string());
             }
@@ -139,6 +142,21 @@ pub fn new_menu(){
                 let app = get_main_lib_default().unwrap();
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
                 let _=create_file_from_str(project_name.to_string()+"/src/lib.rs",content.as_bytes(),"Create  lib.rs successfully.👌".to_string());
+            }
+            // create err.rs
+            dir_name="./resource/err.rs.template".to_string();
+            if check_file_exists(&dir_name){
+                match copy_file(&dir_name,project_name.to_string()+"/src/err.rs"){
+                    Ok(_) => println!("Create  err.rs  successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying file: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            }else{
+                let app = get_err_default().unwrap();
+                let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let _=create_file_from_str(project_name.to_string()+"/src/err.rs",content.as_bytes(),"Create  err.rs successfully.👌".to_string());
             }
             // create controller directory
             dir_name=project_name.to_string()+"/src/controller";
