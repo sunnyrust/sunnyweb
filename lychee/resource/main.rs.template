@@ -1,5 +1,23 @@
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use axum::{
+    Extension,
+};
 
-fn main() {
-        println!("Hello, world!");
+use std::sync::Arc;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+#[tokio::main]
+async fn main() {
+        eprintln!(
+r#"
+╔══╗
+╚╗╔╝
+╔╝(¯`v´¯)
+╚══`.¸.[🅰 🆇 🆄 🅼 🌐🌱]
+"#);
+        tracing_subscriber::registry()
+        .with(
+                tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "lychee=debug".into()),  //,tower_http=debug
+        ).with(tracing_subscriber::fmt::layer())
+        .init();
+        tracing::info!("Hello, world!");
 }

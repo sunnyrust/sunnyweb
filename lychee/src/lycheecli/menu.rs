@@ -75,17 +75,27 @@ pub fn new_menu(){
             thread::sleep(millis);
             // create main.rs
             dir_name=project_name.to_string()+"/src/main.rs";
-            if check_file_exists("./resource/main.rs.template"){
-                match create_file_from_template(dir_name,"./resource/main.rs.template".to_string()){
+        
+            let mut target=project_name.to_string();
+            target=target.replace("-", "_");
+            target=format!("{}=debug",target);
+            let tp=TemplateParams::new(true,"lychee=debug".to_string(),target);
+            if check_file_exists("./resource/main.rs.template"){ 
+                match create_file_from_template(dir_name,"./resource/main.rs.template".to_string(),tp.clone()){
                     Ok(_)=>println!("Create  main.rs successfully.👌"),
                     Err(e)=>println!("{}",e)
                 }
             }else{
                 let app = get_main_default().unwrap();
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let s_content=content.to_string();
+                let content=s_content.replace(&tp.clone().source,&tp.clone().target);
                 let _=create_file_from_str(dir_name,content.as_bytes(),"Create  main.rs successfully.👌".to_string());
             }
             thread::sleep(millis);
+            // Modify main.rs
+            dir_name=project_name.to_string()+"/src/main.rs";
+            // create static directory
             dir_name=project_name.to_string()+"/static/Css";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
@@ -105,7 +115,8 @@ pub fn new_menu(){
             // create app.toml
             dir_name=project_name.to_string()+"/configs/app.toml";
             if check_file_exists("./resource/app.toml.template"){
-                let _=create_file_from_template(dir_name,"./resource/app.toml.template".to_string());
+                let tp=TemplateParams::default();
+                let _=create_file_from_template(dir_name,"./resource/app.toml.template".to_string(),tp);
             }else{
                 let app = get_app_default().unwrap();
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();

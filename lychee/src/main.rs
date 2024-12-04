@@ -41,7 +41,7 @@ fn main() {
             .unwrap_or_else(|_| "lychee=debug".into()),  //,tower_http=debug
     ).with(tracing_subscriber::fmt::layer())
     .init();
-
+    // tracing::info!("Starting lychee");
     logo();
 
     menu::new_menu();
