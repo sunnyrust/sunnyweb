@@ -21,6 +21,7 @@
 - [x] Create config.rs
 - [x] Create lib.rs
 - [x] Loads template files into the rust binary
+- [x] Add git HEAD into the binary.
 - [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.
@@ -35,6 +36,34 @@ You can use it to write your own web pages.It is written in Rust. It is based on
 It has a simple command line app.It is written in Rust and very simple to use.I named it Lychee.
 Yeap,It is a specification.
 It is a technique supported by some model-view-controller frameworks, in which the programmer may write a specification that describes how the application database may be used. The compiler uses this specification to generate code that the application can use to create, read, update and delete database entries, effectively treating the template as a "scaffold" on which to build a more powerful application.
+## Database
+It uses SQLite.Because it is simple and easy to use.
+I use it to store the user information.
+### create database user
+```shell
+sqlite3 auth.db
+```
+```sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, --id
+    username TEXT NOT NULL UNIQUE, --username
+    password_hash TEXT NOT NULL    --password
+);
+```
+Initially, I wanted to use the MD5.
+But I found that it is not secure enough.Recently, MD5 has been recognized as an insufficiently secure hashing algorithm because it is vulnerable to collision attacks.
+In practice, it is recommended to use a more secure hash algorithm such as SHA-256 or bcrypt.
+### create a little tool
+Because there is no linux tool like md5sum.I will write a little tool to generate the hash value.
+I named it sunny_bcrypt.
+## Model
+It uses Axum.
+It is a web framework.
+## View
+It uses Axum.
+It is a template engine.It is very simple to use.
+It is a very powerful template engine.
+It is written in Rust.
 
 ## How to use it?
 1.Install rust.

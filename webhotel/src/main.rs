@@ -2,7 +2,8 @@ use tower_http::{
     services::{ServeDir},
     // trace::TraceLayer,
 };
-use webhotel::{config,  router};
+use webhotel::{config,  router,AppState};
+use tera::Tera;
 use axum::{
     // http::StatusCode,
     // response::IntoResponse,
@@ -23,11 +24,21 @@ async fn main() {
     };
     let serve_dir = get_service(ServeDir::new("./static")).handle_error(webhotel::handle_error);
     let css_dir = get_service(ServeDir::new("./static/css")).handle_error(webhotel::handle_error);
+    let js_dir = get_service(ServeDir::new("./static/js")).handle_error(webhotel::handle_error);
+    let images_dir = get_service(ServeDir::new("./static/images")).handle_error(webhotel::handle_error);
+
+    // init app state
+    let tera = Tera::new("templates/**/*").unwrap();
+    let app_state = AppState { tera };
+
     let app=router::init()
         .nest_service("/static", serve_dir.clone())
         .nest_service("/css", css_dir.clone())
+        .nest_service("/js", js_dir.clone())
+        .nest_service("/images", images_dir.clone())
         .fallback_service(serve_dir)
-        .layer(Extension(Arc::new(web_info))) ;
+        .layer(Extension(Arc::new(web_info)))
+        .layer(Extension(Arc::new(app_state)));
     tracing::info!("🌱🌎 服务监听于{}🌐🌱", &cfg.web.addr);
     axum::Server::bind(&cfg.web.addr.parse().unwrap())
         .serve(app.into_make_service())

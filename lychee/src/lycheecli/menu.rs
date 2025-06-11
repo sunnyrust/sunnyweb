@@ -8,7 +8,7 @@ use std::{thread, time};
 
 #[derive(Parser)]
 #[command(name = "lycheecli")]
-#[command(about = "A command-line interface for managing databases", long_about = None)]
+#[command(about = "A command-line specification for web app", long_about = None)]
 #[command(author="Sunny Region", version= crate::GIT_VERSION,  long_about = None)]
 
 struct Cli {

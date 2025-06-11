@@ -8,12 +8,14 @@
 mod err;
 pub mod config;
 pub mod router;
+pub mod controller;
 use dotenv::dotenv;
 use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
 use std::{io};
+use tera::Tera;
 pub async  fn handle_error(_err: io::Error) -> impl IntoResponse {
     (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
 }
@@ -28,13 +30,12 @@ pub fn new(website_name:&str)->config::Config{
     }
     tracing_subscriber::fmt::init();
     dotenv().ok();
-    let aaa=config::Config::from_file("./webhotel.toml").unwrap();
-    // println!("{:?}\t{:?}",&aaa.web.addr,&aaa.web.version);
-    //config::Config::from_env().unwrap()
-    aaa
-    // config::Config::from_file("./webhotel.conf").unwrap()
+    config::Config::from_file("./webhotel.toml").unwrap()
 }
-
+// app state
+pub struct AppState {
+    pub tera: Tera,
+}
 
 #[cfg(test)]
 mod tests {

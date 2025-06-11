@@ -3,3 +3,5 @@
 *.db
 /sunny-web
 sunny-web/
+/embedfiles
+/embedfiles/
