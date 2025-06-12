@@ -1,6 +1,7 @@
 pub mod menu;
 pub mod utils;
 pub mod config;
+pub mod db;
 use std::fs;
 use serde::{Deserialize, Serialize};
 use std::fs::{ OpenOptions};

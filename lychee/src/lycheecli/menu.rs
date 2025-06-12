@@ -3,8 +3,8 @@ use crate::lycheecli::{utils::*,*};
 // use aok::connection::Connection;
 use clap::{Parser,  Subcommand};
 use std::{thread, time};
+use crate::lycheecli::db::sqlite;
 
-// use tokio::runtime::Runtime;
 
 #[derive(Parser)]
 #[command(name = "lycheecli")]
@@ -33,6 +33,17 @@ enum Commands {
         #[arg(short, long,default_value = "sunny-web")]
         name:String,
     },
+    /// Manage databases for a web App
+    #[clap(alias = "db")]
+    #[clap(about = "Manage databases for a web App. Short name is 'db'.\nExample: \n\tlycheecli databases --name=auth.db\n\tlycheecli db--name=auth.db")]
+    Databases {
+        #[arg(short, long,default_value = "sunny-web")]
+        name: String,
+        #[arg(short, long,default_value = "auth.db")]
+        database: String,
+    },
+    #[clap(about = "List all web App.Short name is 'ls'. \nExample: \n\tlycheecli list\n\tlycheecli ls")]
+    #[clap(alias = "ls")]
     /// List all databases
     List,
 }
@@ -183,6 +194,32 @@ pub fn new_menu(){
                 utils::remove_dir(&dir_name).expect("remove dir failed");
             }
             println!("Drop a web app {}",name);
+        }
+        Commands::Databases { name,database } => {
+            println!("Manage databases for web app {}, database: {}", name, database);
+            let path=name.to_string();
+            if !dir_exists(&path) {
+                tracing::error!("Directory is not exists: {}.You must create it first.Example: \n\tlycheecli new --name={} --authors=[\"jinheking@163.com\"] --edition=2021", path,path);
+                std::process::exit(1);
+            } 
+            let db_path = format!("./{}/{}", path, database);
+            if check_file_exists(&db_path) {
+                println!("Database {} already exists.\nIf you want to initialize it, you could drop it first.", database);
+                std::process::exit(0);
+            }
+            let millis = time::Duration::from_millis(300);
+            thread::sleep(millis);
+            println!("Database path: {}", db_path);
+            //sqlite::init(db_path).await.unwrap();
+            tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap()
+                .block_on(async {
+                    sqlite::init(db_path).await.unwrap();
+            });
+
+            println!("Database {} initialized successfully.", database);
         }
         Commands::List => {
             println!("Listing all web app");
