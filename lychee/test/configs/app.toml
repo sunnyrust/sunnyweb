@@ -1,5 +1,0 @@
-[db]
-    pg="postgres://dba:Q123456@localhost:5432/auth"
-    connections=10
-[app]
-    addr="0.0.0.0:9807"
