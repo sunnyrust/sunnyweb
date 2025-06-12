@@ -218,8 +218,50 @@ pub fn new_menu(){
                 .block_on(async {
                     sqlite::init(db_path).await.unwrap();
             });
-
             println!("Database {} initialized successfully.", database);
+
+            // append to Cargo.toml
+            let cargo_toml_path = format!("{}/Cargo.toml", path);
+            if check_file_exists(&cargo_toml_path) {
+                let mut content = std::fs::read_to_string(&cargo_toml_path)
+                    .expect("Failed to read Cargo.toml");
+                if !content.contains("sqlx") {
+                    content.push_str("\nsqlx = { version = \"0.8.6\", features = [\"sqlite\", \"runtime-tokio-rustls\"] }");
+                    std::fs::write(&cargo_toml_path, &content)
+                        .expect("Failed to write Cargo.toml");
+                    println!("Added sqlx dependency to Cargo.toml");
+                } else {
+                    println!("sqlx dependency already exists in Cargo.toml");
+                }
+
+                if !content.contains("tokio") {
+                    content.push_str("\ntokio = { version = \"1.0\", features = [\"full\"] }");
+                    std::fs::write(&cargo_toml_path, &content)
+                        .expect("Failed to write Cargo.toml");
+                    println!("Added tokio dependency to Cargo.toml");
+                } else {
+                    println!("tokio dependency already exists in Cargo.toml");
+                }
+                if !content.contains("anyhow") {
+                    content.push_str("\nanyhow = \"1.0\"");
+                    std::fs::write(&cargo_toml_path, &content)
+                        .expect("Failed to write Cargo.toml");
+                    println!("Added anyhow dependency to Cargo.toml");
+                } else {
+                    println!("anyhow dependency already exists in Cargo.toml");
+                }
+                if !content.contains("rust-argon2 ") {
+                    content.push_str("\nrust-argon2  = \"2.1.0\"");
+                    std::fs::write(&cargo_toml_path, &content)
+                        .expect("Failed to write Cargo.toml");
+                    println!("Added rust-argon2  dependency to Cargo.toml");
+                } else {
+                    println!("rust-argon2  dependency already exists in Cargo.toml");
+                }
+
+            } else {
+                println!("Cargo.toml does not exist at {}", cargo_toml_path);
+            }
         }
         Commands::List => {
             println!("Listing all web app");
