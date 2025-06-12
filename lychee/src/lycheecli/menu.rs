@@ -25,7 +25,7 @@ enum Commands {
         name: String,
         #[arg(short, long,default_value = "[\"jinheking@163.com\"]")]
         authors: String,
-        #[arg(short, long,default_value = "2021")]
+        #[arg(short, long,default_value = "2024")]
         edition: String,
     },
     #[clap(about = "Drop a  web App. \nExample: \n\tlycheecli drop --name=lychee")]
@@ -93,8 +93,8 @@ pub fn new_menu(){
                 let _=create_file_from_str(dir_name,content.as_bytes(),"Create  main.rs successfully.👌".to_string());
             }
             thread::sleep(millis);
-            // Modify main.rs
-            dir_name=project_name.to_string()+"/src/main.rs";
+            // // Modify main.rs
+            // dir_name=project_name.to_string()+"/src/main.rs";
             // create static directory
             dir_name=project_name.to_string()+"/static/Css";
             lycheecli::mkdir(&dir_name);
