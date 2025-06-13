@@ -56,7 +56,6 @@ pub fn new_menu(){
             println!("Creating web App: {}\t author:{}\t edition:{}", name,authors,edition);
             // Determine if the edition is in the right format
             let cfg=&crate::CFG;
-            // tracing::info!("cfg:{:?}",cfg.app.edition);
             if cfg.app.edition.contains(&edition) {
                 tracing::info!("Edition {} is supported", edition);
             } else {
