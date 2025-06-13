@@ -52,7 +52,9 @@ CREATE TABLE users (
 ```
 Initially, I wanted to use the MD5.
 But I found that it is not secure enough.Recently, MD5 has been recognized as an insufficiently secure hashing algorithm because it is vulnerable to collision attacks.
-In practice, it is recommended to use a more secure hash algorithm such as SHA-256 or bcrypt.
+In practice, it is recommended to use a more secure hash algorithm such as argon2 or bcrypt.
+
+I use sqlx  to connect to the database.
 ### create a little tool
 Because there is no linux tool like md5sum.I will write a little tool to generate the hash value.
 I named it sunny_bcrypt.
