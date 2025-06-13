@@ -1,8 +1,11 @@
 use std::fs;
 use std::io;
-use std::fs::{ OpenOptions,File};
-use std::io::{Write,ErrorKind};
+// use std::path::Path;
+use std::fs::{OpenOptions,File};
+use std::io::{Read,Write,ErrorKind};
 use argon2::{self, Config, Variant, Version};
+
+/// TemplateParams struct to hold parameters for file creation from templates
 #[derive(Debug,Clone)]
 pub struct TemplateParams {
     pub flag: bool,
@@ -102,7 +105,9 @@ pub(crate) fn create_file_from_template(path:String,template:String,tp:TemplateP
     buffer.write(content.as_bytes())?;
     Ok(())
 }
-
+/// Append content to a file if a keyword is not present
+/// This function checks if the keyword exists in the content.
+/// If the keyword is not found, it appends the specified content to the file.
 pub(crate) fn append_content(path:&str, content:&mut String,keyword:&str,append_content:&str) { 
     if !content.contains(keyword) {
         content.push_str(append_content);
@@ -114,6 +119,23 @@ pub(crate) fn append_content(path:&str, content:&mut String,keyword:&str,append_
     }
 }
 
+/// Insert text at the beginning of a file
+#[allow(dead_code)]
+pub(crate) fn insert_text_at_beginning(path: String, text_to_insert: &str) -> std::io::Result<()> {
+    // 打开文件并读取内容
+    let mut file = File::open(&path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+
+    // 插入新文本到文件内容前面
+    let new_contents = format!("{}\n{}", text_to_insert, contents);
+
+    // 重新打开文件以清空内容并写入新内容
+    let mut file = File::create(path)?;
+    file.write_all(new_contents.as_bytes())?;
+
+    Ok(())
+}
 /// Password hashing utility using Argon2
 pub struct PasswordHasher {
     salt:String, // Example salt, should be generated securely

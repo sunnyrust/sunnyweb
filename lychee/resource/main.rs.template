@@ -1,9 +1,11 @@
+use tera::Tera;
 use axum::{
+    routing::{get_service},
     Extension,
 };
-
 use std::sync::Arc;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
 #[tokio::main]
 async fn main() {
         eprintln!(

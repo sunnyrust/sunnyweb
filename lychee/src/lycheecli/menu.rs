@@ -91,7 +91,7 @@ pub fn new_menu(){
             target=format!("{}=debug",target);
             let tp=TemplateParams::new(true,"lychee=debug".to_string(),target);
             if check_file_exists("./resource/main.rs.template"){ 
-                match create_file_from_template(dir_name,"./resource/main.rs.template".to_string(),tp.clone()){
+                match create_file_from_template(dir_name.clone(),"./resource/main.rs.template".to_string(),tp.clone()){
                     Ok(_)=>println!("Create  main.rs successfully.👌"),
                     Err(e)=>println!("{}",e)
                 }
@@ -100,9 +100,12 @@ pub fn new_menu(){
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
                 let s_content=content.to_string();
                 let content=s_content.replace(&tp.clone().source,&tp.clone().target);
-                let _=create_file_from_str(dir_name,content.as_bytes(),"Create  main.rs successfully.👌".to_string());
+                let _=create_file_from_str(dir_name.clone(),content.as_bytes(),"Create  main.rs successfully.👌".to_string());
             }
             thread::sleep(millis);
+            let use_project_name=lychee_project.clone().name.replace("-", "_");
+            let text_to_insert=format!("use {}::{{config,router,AppState}};",use_project_name);
+            let _=insert_text_at_beginning(dir_name.clone(),&text_to_insert);
             // // Modify main.rs
             // dir_name=project_name.to_string()+"/src/main.rs";
             // create static directory
@@ -164,6 +167,7 @@ pub fn new_menu(){
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
                 let _=create_file_from_str(project_name.to_string()+"/src/lib.rs",content.as_bytes(),"Create  lib.rs successfully.👌".to_string());
             }
+            thread::sleep(millis);
             // create err.rs
             dir_name="./resource/err.rs.template".to_string();
             if check_file_exists(&dir_name){
@@ -179,6 +183,23 @@ pub fn new_menu(){
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
                 let _=create_file_from_str(project_name.to_string()+"/src/err.rs",content.as_bytes(),"Create  err.rs successfully.👌".to_string());
             }
+            thread::sleep(millis);
+            // crate router.rs
+            dir_name="./resource/router.rs.template".to_string();
+            if check_file_exists(&dir_name){
+                match copy_file(&dir_name,project_name.to_string()+"/src/router.rs"){
+                    Ok(_) => println!("Create  router.rs  successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying file: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            }else{
+                let app = get_router_default().unwrap();
+                let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let _=create_file_from_str(project_name.to_string()+"/src/router.rs",content.as_bytes(),"Create  router.rs successfully.👌".to_string());
+            }
+
             // create controller directory
             dir_name=project_name.to_string()+"/src/controller";
             lycheecli::mkdir(&dir_name);
@@ -215,6 +236,21 @@ pub fn new_menu(){
                 }
             } else {
                 println!("Templates directory does not exist at {}", templates_path);
+            }
+
+            //copy controller to controller
+            let controller_path="./resource/controller";
+            let target_controller_path=project_name.to_string()+"/src/controller";
+            if check_file_exists(&controller_path) {
+                match copy_dir(controller_path, &target_controller_path) {
+                    Ok(_) => println!("Copy controller files successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying controller files: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            } else {
+                println!("Controller directory does not exist at {}", controller_path);
             }
         }
         Commands::Drop { name } => {

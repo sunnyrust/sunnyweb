@@ -2,12 +2,12 @@ use tower_http::{
     services::{ServeDir},
     // trace::TraceLayer,
 };
-use webhotel::{config,  router,AppState};
+use webhotel::{config,router,AppState};
 use tera::Tera;
 use axum::{
     // http::StatusCode,
     // response::IntoResponse,
-    routing::{ get_service},
+    routing::{get_service},
     Extension,
 };
 use std::sync::Arc;
