@@ -107,13 +107,13 @@ pub fn new_menu(){
             // // Modify main.rs
             // dir_name=project_name.to_string()+"/src/main.rs";
             // create static directory
-            dir_name=project_name.to_string()+"/static/Css";
+            dir_name=project_name.to_string()+"/static/css";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
-            dir_name=project_name.to_string()+"/static/Images";
+            dir_name=project_name.to_string()+"/static/images";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
-            dir_name=project_name.to_string()+"/static/Js";
+            dir_name=project_name.to_string()+"/static/js";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
             dir_name=project_name.to_string()+"/templates";
@@ -187,6 +187,36 @@ pub fn new_menu(){
             dir_name=project_name.to_string()+"/src/model";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
+
+            //copy static to ststic
+            let static_path="./resource/static";
+            let target_static_path=project_name.to_string()+"/static";
+            if check_file_exists(&static_path) {
+                match copy_dir(static_path, &target_static_path) {
+                    Ok(_) => println!("Copy static files successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying static files: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            } else {
+                println!("Static directory does not exist at {}", static_path);
+            }
+
+            // copy templates to templates
+            let templates_path="./resource/templates";
+            let target_templates_path=project_name.to_string()+"/templates";
+            if check_file_exists(&templates_path) {
+                match copy_dir(templates_path, &target_templates_path) {
+                    Ok(_) => println!("Copy templates files successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying templates files: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            } else {
+                println!("Templates directory does not exist at {}", templates_path);
+            }
         }
         Commands::Drop { name } => {
             let dir_name=name.to_string()+"/";
@@ -221,47 +251,20 @@ pub fn new_menu(){
             println!("Database {} initialized successfully.", database);
 
             // append to Cargo.toml
-            let cargo_toml_path = format!("{}/Cargo.toml", path);
+            let cargo_toml_path: String = format!("{}/Cargo.toml", path);
             if check_file_exists(&cargo_toml_path) {
-                let mut content = std::fs::read_to_string(&cargo_toml_path)
+                let mut content: String = std::fs::read_to_string(&cargo_toml_path)
                     .expect("Failed to read Cargo.toml");
-                if !content.contains("sqlx") {
-                    content.push_str("\nsqlx = { version = \"0.8.6\", features = [\"sqlite\", \"runtime-tokio-rustls\"] }");
-                    std::fs::write(&cargo_toml_path, &content)
-                        .expect("Failed to write Cargo.toml");
-                    println!("Added sqlx dependency to Cargo.toml");
-                } else {
-                    println!("sqlx dependency already exists in Cargo.toml");
-                }
-
-                if !content.contains("tokio") {
-                    content.push_str("\ntokio = { version = \"1.0\", features = [\"full\"] }");
-                    std::fs::write(&cargo_toml_path, &content)
-                        .expect("Failed to write Cargo.toml");
-                    println!("Added tokio dependency to Cargo.toml");
-                } else {
-                    println!("tokio dependency already exists in Cargo.toml");
-                }
-                if !content.contains("anyhow") {
-                    content.push_str("\nanyhow = \"1.0\"");
-                    std::fs::write(&cargo_toml_path, &content)
-                        .expect("Failed to write Cargo.toml");
-                    println!("Added anyhow dependency to Cargo.toml");
-                } else {
-                    println!("anyhow dependency already exists in Cargo.toml");
-                }
-                if !content.contains("rust-argon2 ") {
-                    content.push_str("\nrust-argon2  = \"2.1.0\"");
-                    std::fs::write(&cargo_toml_path, &content)
-                        .expect("Failed to write Cargo.toml");
-                    println!("Added rust-argon2  dependency to Cargo.toml");
-                } else {
-                    println!("rust-argon2  dependency already exists in Cargo.toml");
-                }
+                
+                append_content(&cargo_toml_path,&mut content, "sqlx", "\nsqlx = { version = \"0.8.6\", features = [\"sqlite\", \"runtime-tokio-rustls\"] }");
+                append_content(&cargo_toml_path,&mut content, "tokio", "\ntokio = { version = \"1.0\", features = [\"full\"] }");
+                append_content(&cargo_toml_path,&mut content, "anyhow", "\nanyhow = \"1.0\"");
+                append_content(&cargo_toml_path,&mut content, "rust-argon2", "\nrust-argon2  = \"2.1.0\"");
 
             } else {
                 println!("Cargo.toml does not exist at {}", cargo_toml_path);
             }
+
         }
         Commands::List => {
             println!("Listing all web app");

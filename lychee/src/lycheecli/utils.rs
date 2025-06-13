@@ -73,6 +73,21 @@ pub(crate)  fn create_file_from_str(path:String,body: &[u8],msg:String)-> std::i
 
     Ok(())
 }
+pub(crate) fn copy_dir(src: &str, dest: &str) -> io::Result<()> {
+    if !fs::metadata(dest).is_ok() {
+        fs::create_dir_all(dest)?;
+    }
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            copy_dir(path.to_str().unwrap(), &format!("{}/{}", dest, entry.file_name().to_str().unwrap()))?;
+        } else {
+            fs::copy(&path, format!("{}/{}", dest, entry.file_name().to_str().unwrap()))?;
+        }
+    }
+    Ok(())
+}
 /// create file from template
 pub(crate) fn create_file_from_template(path:String,template:String,tp:TemplateParams)-> std::io::Result<()>{
     let mut buffer = OpenOptions::new()
@@ -88,6 +103,16 @@ pub(crate) fn create_file_from_template(path:String,template:String,tp:TemplateP
     Ok(())
 }
 
+pub(crate) fn append_content(path:&str, content:&mut String,keyword:&str,append_content:&str) { 
+    if !content.contains(keyword) {
+        content.push_str(append_content);
+        std::fs::write(path, &content)
+         .expect("Failed to write Cargo.toml");
+     println!("Added {} dependency to Cargo.toml", keyword);
+    } else {
+        println!("{} dependency already exists in Cargo.toml", keyword);
+    }
+}
 
 /// Password hashing utility using Argon2
 pub struct PasswordHasher {
