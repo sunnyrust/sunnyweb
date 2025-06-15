@@ -15,15 +15,20 @@
 - [x] Create Directory
 - [x] Create Cargo.toml
 - [x] Create main.rs
-- [x] Create README.md
+- [x] Create README.md and add "Project creation date"
 - [x] Determine if the edition is in the right format.
 - [x] Create configs and app.toml.
 - [x] Create config.rs
 - [x] Create lib.rs
 - [x] Loads template files into the rust binary
 - [x] Add git HEAD into the binary.
-- [ ] Create router.rs
+- [x] Create router.rs
 - [x] Create auth.db by sqlite3.
+- [x] Copy static files into the project directory.
+- [x] Copy template files into the project directory.
+- [x] Copy congtrollers into the project directory.
+- [x] The first time running this project
+- [x] Create Docker folder.
 - [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.

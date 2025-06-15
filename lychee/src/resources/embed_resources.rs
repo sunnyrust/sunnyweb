@@ -30,7 +30,10 @@ pub fn get_main_lib_default() -> Option<rust_embed::EmbeddedFile> {
 pub fn get_main_default() -> Option<rust_embed::EmbeddedFile> {
     Asset::get("main.rs.template")
 }
-
+/// get docker_file
+pub fn get_dockerfile_default() -> Option<rust_embed::EmbeddedFile> {
+    Asset::get("Dockerfile.template")
+}
 /// get router.rs
 pub fn get_router_default() -> Option<rust_embed::EmbeddedFile> {
     Asset::get("router.rs.template")

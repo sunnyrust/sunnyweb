@@ -5,7 +5,7 @@ use std::fs::{OpenOptions,File};
 use std::io::{Read,Write,ErrorKind};
 use argon2::{self, Config, Variant, Version};
 
-/// TemplateParams struct to hold parameters for file creation from templates
+/// TemplateParams struct to exchange template parameters
 #[derive(Debug,Clone)]
 pub struct TemplateParams {
     pub flag: bool,
@@ -92,15 +92,17 @@ pub(crate) fn copy_dir(src: &str, dest: &str) -> io::Result<()> {
     Ok(())
 }
 /// create file from template
-pub(crate) fn create_file_from_template(path:String,template:String,tp:TemplateParams)-> std::io::Result<()>{
+pub(crate) fn create_file_from_template(path:String,template:String,tp:Vec<TemplateParams>)-> std::io::Result<()>{
     let mut buffer = OpenOptions::new()
     .read(true)
     .write(true)
     .create(true)
     .open(&path).unwrap();
     let mut content = fs::read_to_string(&template).expect("Failed to read file");
-    if tp.flag {
-        content = content.replace( &tp.source, &tp.target);
+    for param in tp {
+        if param.flag {
+            content = content.replace(&param.source, &param.target);
+        }
     }
     buffer.write(content.as_bytes())?;
     Ok(())

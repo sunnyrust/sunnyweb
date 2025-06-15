@@ -30,7 +30,7 @@ pub fn new(website_name:&str)->config::Config{
     }
     tracing_subscriber::fmt::init();
     dotenv().ok();
-    config::Config::from_file("./webhotel.toml").unwrap()
+    config::Config::from_file("./").unwrap()
 }
 // app state
 pub struct AppState {

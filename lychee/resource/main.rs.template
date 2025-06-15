@@ -1,13 +1,34 @@
+use tower_http::{
+    services::{ServeDir},
+};
 use tera::Tera;
 use axum::{
-    routing::{get_service},
+    // http::StatusCode,
+    // response::IntoResponse,
+    routing::method_routing::get_service,
     Extension,
 };
 use std::sync::Arc;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() {
+        let cfg=lychee::new("lychee");
+        // println!("I'm lying flat.\t I'm locking down.");
+        tracing::info!("I'm lying flat.\t I'm locking down in webhotel.");
+        // tracing::debug!("{}---{}",&cfg.web.addr.clone(),&cfg.web.version.clone());
+        let web_info=config::WebHotelInfo{
+                web_addr:cfg.web.addr.clone(),
+                web_version:cfg.web.version.clone(),
+        };
+        // let serve_dir = get_service(ServeDir::new("./static")).handle_error(webhotel::handle_error);
+        // let css_dir = get_service(ServeDir::new("./static/css")).handle_error(webhotel::handle_error);
+        // let js_dir = get_service(ServeDir::new("./static/js")).handle_error(webhotel::handle_error);
+        // let images_dir = get_service(ServeDir::new("./static/images")).handle_error(webhotel::handle_error);
+
+        // init app state
+        // let tera = Tera::new("templates/**/*").unwrap();
+
+
         eprintln!(
 r#"
 ╔══╗
@@ -15,11 +36,5 @@ r#"
 ╔╝(¯`v´¯)
 ╚══`.¸.[🅰 🆇 🆄 🅼 🌐🌱]
 "#);
-        tracing_subscriber::registry()
-        .with(
-                tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "lychee=debug".into()),  //,tower_http=debug
-        ).with(tracing_subscriber::fmt::layer())
-        .init();
         tracing::info!("Hello, world!");
 }

@@ -1,6 +1,7 @@
 use crate::lycheecli;
 use crate::lycheecli::{utils::*,*};
 // use aok::connection::Connection;
+use chrono::Local;
 use clap::{Parser,  Subcommand};
 use std::{thread, time};
 use crate::lycheecli::db::sqlite;
@@ -78,20 +79,29 @@ pub fn new_menu(){
             let readme_path=project_name.to_string()+"/README.md";
             let _=lychee_project.create_readme(readme_path.to_string());
             thread::sleep(millis);
-            
+            let mut content: String = std::fs::read_to_string(&readme_path)
+                    .expect("Failed to read Cargo.toml");
+            append_content(&readme_path,&mut content, "Project creation date:", format!("\nProject creation date: {}", Local::now().format("%Y-%m-%d")).as_str());
             // create directorys
             let mut dir_name=project_name.to_string()+"/src";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
             // create main.rs
             dir_name=project_name.to_string()+"/src/main.rs";
-        
+            let mut params_vec:Vec<TemplateParams> = Vec::new();// Create a vector to hold TemplateParams
             let mut target=project_name.to_string();
             target=target.replace("-", "_");
-            target=format!("{}=debug",target);
-            let tp=TemplateParams::new(true,"lychee=debug".to_string(),target);
+            let mut tp_target=format!("{}=debug",target);
+            let mut tp=TemplateParams::new(true,"lychee=debug".to_string(),tp_target);
+            params_vec.push(tp.clone());
+            tp_target=format!{"let cfg={}::new(\"{}\");",target,target};
+            tp=TemplateParams::new(true,"let cfg=lychee::new(\"lychee\");".to_string(),tp_target);
+            params_vec.push(tp.clone());
+            tp_target=format!("{}::handle_error",target);
+            tp=TemplateParams::new(true,"webhotel::handle_error".to_string(),tp_target);
+            params_vec.push(tp.clone());
             if check_file_exists("./resource/main.rs.template"){ 
-                match create_file_from_template(dir_name.clone(),"./resource/main.rs.template".to_string(),tp.clone()){
+                match create_file_from_template(dir_name.clone(),"./resource/main.rs.template".to_string(),params_vec){
                     Ok(_)=>println!("Create  main.rs successfully.👌"),
                     Err(e)=>println!("{}",e)
                 }
@@ -129,7 +139,9 @@ pub fn new_menu(){
             dir_name=project_name.to_string()+"/configs/app.toml";
             if check_file_exists("./resource/app.toml.template"){
                 let tp=TemplateParams::default();
-                let _=create_file_from_template(dir_name,"./resource/app.toml.template".to_string(),tp);
+                let mut params_vec:Vec<TemplateParams> = Vec::new();// Create a vector to hold TemplateParams
+                params_vec.push(tp.clone());
+                let _=create_file_from_template(dir_name,"./resource/app.toml.template".to_string(),params_vec);
             }else{
                 let app = get_app_default().unwrap();
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
@@ -251,6 +263,22 @@ pub fn new_menu(){
                 }
             } else {
                 println!("Controller directory does not exist at {}", controller_path);
+            }
+            // create Docker folder
+            dir_name=project_name.to_string()+"/Docker";
+            lycheecli::mkdir(&dir_name);
+            thread::sleep(millis);
+            // create Dockerfile
+            dir_name=project_name.to_string()+"/Docker/Dockerfile";
+            if check_file_exists("./resource/Dockerfile.template") {
+                let tp=TemplateParams::default();
+                let mut params_vec:Vec<TemplateParams> = Vec::new();// Create a vector to hold TemplateParams
+                params_vec.push(tp.clone());
+                let _=create_file_from_template(dir_name,"./resource/Dockerfile.template".to_string(),params_vec);
+            } else {
+                let app = get_dockerfile_default().unwrap();
+                let content = std::str::from_utf8(app.data.as_ref()).unwrap();
+                let _=create_file_from_str(dir_name,content.as_bytes(),"Create  Dockerfile successfully.👌".to_string());
             }
         }
         Commands::Drop { name } => {
