@@ -12,6 +12,13 @@ use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
+        eprintln!(
+r#"
+╔══╗
+╚╗╔╝
+╔╝(¯`v´¯)
+╚══`.¸.[🅰 🆇 🆄 🅼 🌐🌱]
+"#);
         let cfg=lychee::new("lychee");
         // println!("I'm lying flat.\t I'm locking down.");
         tracing::info!("I'm lying flat.\t I'm locking down in webhotel.");
@@ -20,21 +27,26 @@ async fn main() {
                 web_addr:cfg.web.addr.clone(),
                 web_version:cfg.web.version.clone(),
         };
-        // let serve_dir = get_service(ServeDir::new("./static")).handle_error(webhotel::handle_error);
-        // let css_dir = get_service(ServeDir::new("./static/css")).handle_error(webhotel::handle_error);
-        // let js_dir = get_service(ServeDir::new("./static/js")).handle_error(webhotel::handle_error);
-        // let images_dir = get_service(ServeDir::new("./static/images")).handle_error(webhotel::handle_error);
+        let serve_dir = get_service(ServeDir::new("./static")).handle_error(webhotel::handle_error);
+        let css_dir = get_service(ServeDir::new("./static/css")).handle_error(webhotel::handle_error);
+        let js_dir = get_service(ServeDir::new("./static/js")).handle_error(webhotel::handle_error);
+        let images_dir = get_service(ServeDir::new("./static/images")).handle_error(webhotel::handle_error);
 
         // init app state
-        // let tera = Tera::new("templates/**/*").unwrap();
+        let tera = Tera::new("templates/**/*").unwrap();
 
-
-        eprintln!(
-r#"
-╔══╗
-╚╗╔╝
-╔╝(¯`v´¯)
-╚══`.¸.[🅰 🆇 🆄 🅼 🌐🌱]
-"#);
-        tracing::info!("Hello, world!");
+        let app_state = AppState { tera };
+        let app=router::init()
+            .nest_service("/static", serve_dir.clone())
+            .nest_service("/css", css_dir.clone())
+            .nest_service("/js", js_dir.clone())
+            .nest_service("/images", images_dir.clone())
+            .fallback_service(serve_dir)
+            .layer(Extension(Arc::new(web_info)))
+            .layer(Extension(Arc::new(app_state)));
+        tracing::info!("🌱🌎 服务监听于{}🌐🌱", &cfg.web.addr);
+        axum::Server::bind(&cfg.web.addr.parse().unwrap())
+            .serve(app.into_make_service())
+            .await
+            .unwrap();
 }
