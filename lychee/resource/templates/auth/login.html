@@ -98,7 +98,7 @@
                                                                type="text"><span class="ax-pos-right"><a href="###"
                                                                                                          class="ax-iconfont ax-icon-close ax-val-none"></a></span>
                                                     </div>
-                                                    <a href="###" class="ax-form-img"><img src="/images/auth/yanzhengma.jpg"></a>
+                                                    <a href="javascript:void(0)" id="refresh-captcha" class="ax-form-img"><img src="{{ captcha_image }}" id="captcha-image" alt="captcha"></a>
                                                 </div>
                                             </div>
 
@@ -251,5 +251,19 @@
 </div>
 <script src="/js/ax.min.js" type="text/javascript"></script>
 </body>
-
+<script type="text/javascript">
+   
+document.getElementById('refresh-captcha').addEventListener('click', async function () {
+    try {
+        // Append a timestamp to avoid caching
+        fetch(`/login/captcha?t=${new Date().getTime()}`)
+        .then(response => response.text())
+        .then(base64 => {
+            document.getElementById('captcha-image').src = `${base64}`;
+        });
+    } catch (error) {
+        console.error('CAPTCHA refresh unsuccessful.:', error);
+    }
+});
+</script>
 </html>

@@ -264,12 +264,8 @@ pub fn new_menu(){
             } else {
                 println!("Controller directory does not exist at {}", controller_path);
             }
-            // create Docker folder
-            dir_name=project_name.to_string()+"/Docker";
-            lycheecli::mkdir(&dir_name);
-            thread::sleep(millis);
             // create Dockerfile
-            dir_name=project_name.to_string()+"/Docker/Dockerfile";
+            dir_name=project_name.to_string()+"/Dockerfile";
             if check_file_exists("./resource/Dockerfile.template") {
                 let tp=TemplateParams::default();
                 let mut params_vec:Vec<TemplateParams> = Vec::new();// Create a vector to hold TemplateParams

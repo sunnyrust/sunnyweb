@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum AppErrorType {
     Database,
@@ -5,13 +6,13 @@ pub enum AppErrorType {
 }
 
 type Cause = Box<dyn std::error::Error>;
-
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum AppErrorItem {
     Message(Option<String>),
     Cause(Cause),
 }
-
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct AppError {
     pub types: AppErrorType,

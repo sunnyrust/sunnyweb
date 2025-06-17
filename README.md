@@ -28,7 +28,9 @@
 - [x] Copy template files into the project directory.
 - [x] Copy congtrollers into the project directory.
 - [x] The first time running this project
-- [x] Create Docker folder.
+- [x] Create Dockerfile.
+- [x] Create Makefile.
+- [x] Create CAPTCHA.
 - [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.
