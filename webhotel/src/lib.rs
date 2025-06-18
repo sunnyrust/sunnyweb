@@ -27,11 +27,14 @@ pub fn new(website_name:&str)->config::Config{
     if std::env::var_os("RUST_LOG").is_none() {
         let v=format!("{}=debug",website_name);
         std::env::set_var("RUST_LOG", v);
+        //std::env::set_var("WEBSITE_NAME", website_name);
     }
-    tracing_subscriber::fmt::init();
+
     dotenv().ok();
     config::Config::from_file("./webhotel.toml").unwrap()
 }
+
+
 // app state
 pub struct AppState {
     pub tera: Tera,

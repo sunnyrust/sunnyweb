@@ -1,4 +1,4 @@
-pub mod err;
+mod err;
 pub mod config;
 pub mod controller;
 pub mod router;
@@ -16,15 +16,13 @@ pub async  fn handle_error(_err: io::Error) -> impl IntoResponse {
 
 
 // use tracing_subscriber::prelude::*;
-
 pub fn new(website_name:&str)->config::Config{
     if std::env::var_os("RUST_LOG").is_none() {
         let v=format!("{}=debug",website_name);
         unsafe {
-        std::env::set_var("RUST_LOG", v);
+            std::env::set_var("RUST_LOG", v);
         }
     }
-    tracing_subscriber::fmt::init();
     dotenv().ok();
     config::Config::from_file("./configs/app.toml").unwrap()
 }

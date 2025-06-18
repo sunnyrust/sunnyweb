@@ -6,8 +6,8 @@ struct Asset;
 
 /// get Cargo.toml
 pub fn get_app_cargo_default() -> Option<rust_embed::EmbeddedFile> {
-    assert!(Asset::get("Cargo.template").is_some(), "Cargo.template should exist");
-    Asset::get("Cargo.template")
+    assert!(Asset::get("Cargo.toml.toml.template").is_some(), "Cargo.toml.template should exist");
+    Asset::get("Cargo.toml.template")
 }
 /// get app.toml
 pub fn get_app_default() -> Option<rust_embed::EmbeddedFile> {

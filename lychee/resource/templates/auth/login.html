@@ -48,7 +48,7 @@
 
                     <ul class="ax-tab-content">
                         <li>
-                            <form>
+                            <form id="loginform" method="post" action="/login/login" >
 
                                 <div class="ax-break"></div>
                                 <div class="ax-break ax-hide-tel"></div>
@@ -133,7 +133,7 @@
                                     <div class="ax-flex-row">
                                         <div class="ax-flex-block">
                                             <div class="ax-form-input">
-                                                <button type="button" class="ax-btn ax-primary ax-full">登录</button>
+                                                <input type="submit" id="submit" class="ax-btn ax-primary ax-full" value="登录"></input>
                                             </div>
                                         </div>
                                     </div>
@@ -252,7 +252,16 @@
 <script src="/js/ax.min.js" type="text/javascript"></script>
 </body>
 <script type="text/javascript">
-   
+// 获取按钮和表单元素
+const submitBtn = document.getElementById('submit');
+const myForm = document.getElementById('loginform');
+
+// 添加点击事件监听器
+submitBtn.addEventListener('click', () => {
+    // myForm.dispatchEvent(new Event('submit'));
+    myForm.submit();
+    // myForm.submit(); // 触发表单提交
+});
 document.getElementById('refresh-captcha').addEventListener('click', async function () {
     try {
         // Append a timestamp to avoid caching

@@ -103,8 +103,8 @@ pub(crate) fn create_cargo_toml(cargo: crate::lycheecli::Cargo,path:String)-> st
     buffer.write(b"\n\n")?;
     // let content = include_str!("../../resource/Cargo.template");
     //if  std::path::Path::new("./resource/Cargo.template").exists() {
-    if    check_file_exists("./resource/Cargo.template"){
-        let content = include_str!("../../resource/Cargo.template");
+    if    check_file_exists("./resource/Cargo.toml.template"){
+        let content = include_str!("../../resource/Cargo.toml.template");
         buffer.write(content.as_bytes())?;
     }else{
         let app = get_app_cargo_default().unwrap();

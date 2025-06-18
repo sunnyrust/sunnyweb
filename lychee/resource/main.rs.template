@@ -7,10 +7,17 @@ use axum::{
     // response::IntoResponse,
     // routing::method_routing::get_service,
     Extension,
+    Router,
+    routing::get,
+    http::Request,
+    body::Body,
 };
+use tower_http::trace::TraceLayer;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use tower_sessions::{SessionManagerLayer};
-use tower_sessions::MemoryStore; // In production, migrate to persistent storage such as Redis.
+// use tower_sessions::MemoryStore; // In production, migrate to persistent storage such as Redis.
+use tower_sessions_redis_store::{fred::prelude::*,RedisStore}; // In production, migrate to persistent storage such as Redis.
 use std::sync::Arc;
 
 #[tokio::main]
@@ -30,6 +37,39 @@ r#"
                 web_addr:cfg.web.addr.clone(),
                 web_version:cfg.web.version.clone(),
         };
+        let run_mode=cfg.web.runmode.clone();
+        let website_name="lychee".to_string();
+        if run_mode=="dev"{
+        tracing_subscriber::registry()
+            .with(
+                tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+                    // axum logs rejections from built-in extractors with the `axum::rejection`
+                    // target, at `TRACE` level. `axum::rejection=trace` enables showing those events
+                    format!(
+                        "{}=debug,tower_http=debug,axum::rejection=trace",
+                        website_name
+                    )
+                    .into()
+                }),
+            )
+            .with(tracing_subscriber::fmt::layer().pretty())
+            .init();
+        }else{
+            tracing_subscriber::registry()
+            .with(
+                tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+                    // axum logs rejections from built-in extractors with the `axum::rejection`
+                    // target, at `TRACE` level. `axum::rejection=trace` enables showing those events
+                    format!(
+                        "{}=debug,tower_http=debug,axum::rejection=trace",
+                        website_name
+                    )
+                    .into()
+                }),
+            )
+            .with(tracing_subscriber::fmt::layer())
+            .init();
+        }
         // let serve_dir = get_service(ServeDir::new("./static")).handle_error(webhotel::handle_error);
         // let css_dir = get_service(ServeDir::new("./static/css")).handle_error(webhotel::handle_error);
         // let js_dir = get_service(ServeDir::new("./static/js")).handle_error(webhotel::handle_error);
@@ -43,8 +83,27 @@ r#"
         let app_state = AppState { tera };
 
         // ‌Initialize session storage (in-memory storage, for demonstration purposes only).
-        let session_store = MemoryStore::default();
-        let session_layer = SessionManagerLayer::new(session_store);
+        // let session_store = MemoryStore::default();
+        // let session_layer = SessionManagerLayer::new(session_store);
+        let redis_url = format!(
+            "redis://:{}@{}:{}",
+            cfg.redis.password.clone(),
+            cfg.redis.host.clone(),
+            cfg.redis.port.clone(),
+        );
+        // let pool = Pool::new(Config::new(redis_url), None, None, None, 6).unwrap();
+        let pool = Pool::new(tower_sessions_redis_store::fred::prelude::Config::from_url(&redis_url).unwrap(), None, None, None, 6).unwrap();
+        let redis_conn = pool.connect();
+        pool.wait_for_connect().await.unwrap();
+        // 2. 创建 Redis 存储
+        let redis_store = RedisStore::new(pool);
+
+        // 3. 创建会话管理层
+        let session_layer = SessionManagerLayer::new(redis_store)
+            .with_name("webhotel_session")
+            .with_secure(cfg.redis.with_secure.clone()); // 生产环境应该设为 true
+
+            
         let app=router::init()
             .nest_service("/static", serve_dir.clone())
             .nest_service("/css", css_dir.clone())
@@ -53,8 +112,30 @@ r#"
             .fallback_service(serve_dir)
             .layer(Extension(Arc::new(web_info)))
             .layer(Extension(Arc::new(app_state)))
-            .layer(session_layer);
+            .layer(session_layer)
+            .layer(
+                TraceLayer::new_for_http()
+                    .make_span_with(|request: &Request<Body>| {
+                        tracing::info_span!(
+                            "request",
+                            method = %request.method(),
+                            uri = %request.uri(),
+                            version = ?request.version(),
+                        )
+                    })
+                    .on_request(|request: &Request<Body>, _span: &tracing::Span| {
+                        tracing::info!("Started {} {}", request.method(), request.uri());
+                    })
+                    .on_response(|response: &axum::response::Response, latency: std::time::Duration, _span: &tracing::Span| {
+                        tracing::info!(
+                            "Completed {} in {}ms",
+                            response.status(),
+                            latency.as_millis()
+                        );
+                    })
+            );
         tracing::info!("🌱🌎 服务监听于{}🌐🌱", &cfg.web.addr);
         let listener = tokio::net::TcpListener::bind(&cfg.web.addr).await.unwrap();
         axum::serve(listener,app).await.unwrap();
+        let _= redis_conn.await.unwrap();
 }

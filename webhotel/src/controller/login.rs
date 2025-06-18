@@ -20,6 +20,7 @@ pub fn login_router() -> Router {
 }
 
 async fn render_login(Extension(state): Extension<Arc<AppState>>,session: Session) -> Html<String> {
+     tracing::info!("Login……😀");
     let mut context = Context::new();
     context.insert("username", "user");
     context.insert("password", "pass");

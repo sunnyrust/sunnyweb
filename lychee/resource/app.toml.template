@@ -1,6 +1,13 @@
 [db]
-    pg="postgres://dba:Q123456@localhost:5432/auth"
+    pg="postgres://sa:123456@localhost/helloworld"
     connections=10
 [web]
-    addr="0.0.0.0:9807"
-    version="0.1.0"
+    addr="0.0.0.0:9808"
+    version="0.1.6"
+    runmode="dev"  # dev or prod
+[redis]
+    host="127.0.0.1"
+    port="6379"
+    username=""
+    password=""
+    with_secure=false

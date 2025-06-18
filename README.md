@@ -31,6 +31,8 @@
 - [x] Create Dockerfile.
 - [x] Create Makefile.
 - [x] Create CAPTCHA.
+- [x] Use redis to store session
+- [x] Check user login
 - [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.

@@ -80,7 +80,7 @@ pub fn new_menu(){
             let _=lychee_project.create_readme(readme_path.to_string());
             thread::sleep(millis);
             let mut content: String = std::fs::read_to_string(&readme_path)
-                    .expect("Failed to read Cargo.toml");
+                    .expect("Failed to read README.md");
             append_content(&readme_path,&mut content, "Project creation date:", format!("\nProject creation date: {}", Local::now().format("%Y-%m-%d")).as_str());
             // create directorys
             let mut dir_name=project_name.to_string()+"/src";
@@ -97,6 +97,10 @@ pub fn new_menu(){
             tp_target=format!{"let cfg={}::new(\"{}\");",target,target};
             tp=TemplateParams::new(true,"let cfg=lychee::new(\"lychee\");".to_string(),tp_target);
             params_vec.push(tp.clone());
+            tp_target=format!{"let website_name=\"{}\".to_string();",target};
+            tp=TemplateParams::new(true,"let website_name=\"lychee\".to_string();".to_string(),tp_target);
+            params_vec.push(tp.clone());
+            
             tp_target=format!("{}::handle_error",target);
             tp=TemplateParams::new(true,"webhotel::handle_error".to_string(),tp_target);
             params_vec.push(tp.clone());

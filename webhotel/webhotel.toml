@@ -1,3 +1,11 @@
 [web]
     addr="0.0.0.0:9807"
     version="0.1.0"
+    runmode="dev"  # dev or prod
+
+[redis]
+    host="127.0.0.1"
+    port="6379"
+    username=""
+    password=""
+    with_secure=false

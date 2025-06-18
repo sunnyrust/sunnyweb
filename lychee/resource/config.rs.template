@@ -3,11 +3,21 @@ use serde::Deserialize;
 pub struct WebConfig {
     pub addr: String,
     pub version: String,
+    pub runmode: String,
+}
+#[derive(Deserialize)]
+pub struct RedisConfig {
+    pub host: String,
+    pub port: String,
+    pub username: String,
+    pub password: String,
+    pub with_secure: bool,
 }
 
 #[derive(Deserialize)]
 pub struct Config {
     pub web: WebConfig,
+    pub redis: RedisConfig,
 }
 impl Config {
     pub fn from_env() -> Result<Self, config::ConfigError> {
