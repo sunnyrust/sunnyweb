@@ -11,6 +11,7 @@ use axum::{
     routing::get,
     http::Request,
     body::Body,
+    middleware,
 };
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -113,6 +114,7 @@ r#"
             .layer(Extension(Arc::new(web_info)))
             .layer(Extension(Arc::new(app_state)))
             .layer(session_layer)
+            .layer(middleware::from_fn(base_controller_middleware))
             .layer(
                 TraceLayer::new_for_http()
                     .make_span_with(|request: &Request<Body>| {

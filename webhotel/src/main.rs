@@ -2,24 +2,24 @@ use tower_http::{
     services::{ServeDir},
     // trace::TraceLayer,
 };
-use webhotel::{config,router,AppState};
+use webhotel::{config,router,AppState,base_controller_middleware};
 use tera::Tera;
 use axum::{
     // http::StatusCode,
     // response::IntoResponse,
     // routing::{get_service},
     Extension,
-    Router,
-    routing::get,
     http::Request,
     body::Body,
+    middleware,
 };
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use tower_sessions::{SessionManagerLayer};
 // use tower_sessions::MemoryStore; // In production, migrate to persistent storage such as Redis.
 use tower_sessions_redis_store::{fred::prelude::*,RedisStore}; // In production, migrate to persistent storage such as Redis.
-use std::sync::Arc;
+use std::sync::{Arc,Mutex};
+// use tokio::sync::Mutex;
 #[tokio::main]
 async fn main() {
     let cfg=webhotel::new("webhotel");
@@ -74,7 +74,8 @@ async fn main() {
     let images_dir = ServeDir::new("./static/images");
     // init app state
     let tera = Tera::new("templates/**/*").unwrap();
-    let app_state = AppState { tera };
+
+    let app_state = AppState { tera, path_segments: Mutex::new(vec![]) };
 
     // ‌Initialize session storage (in-memory storage, for demonstration purposes only).
     // let session_store = MemoryStore::default();
@@ -113,8 +114,9 @@ async fn main() {
         .nest_service("/images", images_dir.clone())
         .fallback_service(serve_dir)
         .layer(Extension(Arc::new(web_info)))
-        .layer(Extension(Arc::new(app_state)))
+        .layer(Extension(Arc::new(app_state.clone())))
         .layer(session_layer)
+        .layer(middleware::from_fn(base_controller_middleware))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|request: &Request<Body>| {
@@ -125,8 +127,21 @@ async fn main() {
                         version = ?request.version(),
                     )
                 })
-                .on_request(|request: &Request<Body>, _span: &tracing::Span| {
+                .on_request(move|request: &Request<Body>, _span: &tracing::Span| {
                     tracing::info!("Started {} {}", request.method(), request.uri());
+                     let uri = request.uri();
+                    // 1. get the full path
+                    let full_path = uri.path();
+                    // tracing::info!("完整路径: {}", full_path);
+                    // 2. split the path into segments
+                    // let path_segments: Vec<&str> = full_path.split('/').filter(|s| !s.is_empty()).collect();
+                    let path_segments: Vec<String> = full_path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
+                    tracing::info!("路径段: {:?}", path_segments);
+                   
+                    let app_state = app_state.clone();
+                    let mut path_segments_lock = app_state.path_segments.lock().unwrap();
+                    *path_segments_lock = path_segments;
+                    tracing::info!("-----{:?}", path_segments_lock);
                 })
                 .on_response(|response: &axum::response::Response, latency: std::time::Duration, _span: &tracing::Span| {
                     tracing::info!(
