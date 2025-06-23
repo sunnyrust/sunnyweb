@@ -9,9 +9,10 @@ mod err;
 pub mod config;
 pub mod router;
 pub mod controller;
+pub mod utils;
 use dotenv::dotenv;
 use axum::{
-    http::StatusCode,
+    http::{StatusCode, Uri},
     response::IntoResponse,
     middleware::Next, 
     extract::Request, 
@@ -21,19 +22,46 @@ use std::{io};
 use tera::Tera;
 use std::sync::{Arc,Mutex};
 
-use axum::http::Uri;
+
+use std::collections::HashMap;
+use serde_json::Value;
+use lazy_static::lazy_static;
+lazy_static! {
+    pub static ref TRANSLATIONS: HashMap<String, Value> = {
+        let mut translations = HashMap::new();
+        
+        // load English translations
+        if let Ok(content) = std::fs::read_to_string("configs/locales/zh-CN.toml") {
+            if let Ok(parsed) = toml::from_str(&content) {
+                translations.insert("zh".to_string(), parsed);
+            }
+        }
+        // load English translations
+        if let Ok(content) = std::fs::read_to_string("configs/locales/en-US.toml") {
+            if let Ok(parsed) = toml::from_str(&content) {
+                translations.insert("en".to_string(), parsed);
+            }
+        }
+        
+        translations
+    };
+}
+pub fn get_translation(lang: &str) -> Option<&Value> {
+    TRANSLATIONS.get(lang)
+}
 #[derive(Clone)]
 pub struct BaseController {
     pub uri: Uri,
+    pub app_version: String,
 }
 
 impl BaseController {
-    pub fn new(uri: Uri) -> Self {
-        Self { uri }
+    pub fn new(uri: Uri, app_version: String) -> Self {
+        Self { uri, app_version }
     }
 
     pub fn log_request(&self) {
-        println!("Request URI: {}", self.uri.path());
+        println!("Request URI: {}\r\nApp Version: {}", self.uri.path(), self.app_version);
     }
 }
 
@@ -41,8 +69,8 @@ impl BaseController {
 
 pub async  fn base_controller_middleware(request: Request, next: Next) -> Response {
     let uri = request.uri().clone();
-    let base_controller = BaseController::new(uri);
-
+    let app_version = std::env::var("WEBSITE_VERSION").unwrap_or_default();
+    let base_controller = BaseController::new(uri,app_version);
     // 存储到请求扩展
     let mut request = request;
     request.extensions_mut().insert(base_controller);

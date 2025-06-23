@@ -1,0 +1,35 @@
+a{
+    color: #01AAED;
+}
+.layui-elem-quote {
+    padding: 5px 15px;
+    margin: 28px 0 12px 0;
+    background: none;
+    color: #393D49;
+    font-size: 18px;
+    border-width: 0px 0px 0px 5px;
+}
+.site-menu{
+    padding: 10px;
+}
+.site-menu li {
+    line-height: 26px;
+    margin-left: 20px;
+    overflow: visible;
+    list-style-type: disc;
+}
+.site-menu li a{
+    color: #333;
+}
+.site-h1 {
+    line-height: 60px;
+    color: #393D49;
+    font-size: 28px;
+    font-weight: 300;
+}
+body{
+    padding-top: 28px;
+}
+.layui-row{
+    margin: 18px 0;
+}

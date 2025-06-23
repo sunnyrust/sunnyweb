@@ -217,9 +217,9 @@ pub fn new_menu(){
             }
 
             // create controller directory
-            dir_name=project_name.to_string()+"/src/controller";
-            lycheecli::mkdir(&dir_name);
-            thread::sleep(millis);
+            // dir_name=project_name.to_string()+"/src/controller";
+            // lycheecli::mkdir(&dir_name);
+            // thread::sleep(millis);
             dir_name=project_name.to_string()+"/src/model";
             lycheecli::mkdir(&dir_name);
             thread::sleep(millis);
@@ -254,19 +254,33 @@ pub fn new_menu(){
                 println!("Templates directory does not exist at {}", templates_path);
             }
 
-            //copy controller to controller
-            let controller_path="./resource/controller";
-            let target_controller_path=project_name.to_string()+"/src/controller";
-            if check_file_exists(&controller_path) {
-                match copy_dir(controller_path, &target_controller_path) {
-                    Ok(_) => println!("Copy controller files successfully.👌"),
+            //copy locales to locales
+            let locales_path="./resource/locales";
+            let target_locales_path=project_name.to_string()+"/configs/locales";
+            if check_file_exists(&locales_path) {
+                match copy_dir(locales_path, &target_locales_path) {
+                    Ok(_) => println!("Copy locales files successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying controller files: {}", e);
+                        eprintln!("Error copying locales files: {}", e);
                         std::process::exit(0);
                     },
                 }
             } else {
-                println!("Controller directory does not exist at {}", controller_path);
+                println!("Locales directory does not exist at {}", locales_path);
+            }
+            //copy src to src
+            let src_path="./resource/src";
+            let target_src_path=project_name.to_string()+"/src";
+            if check_file_exists(&src_path) {
+                match copy_dir(src_path, &target_src_path) {
+                    Ok(_) => println!("Copy src files successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying src files: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            } else {
+                println!("Src directory does not exist at {}", src_path);
             }
             // create Dockerfile
             dir_name=project_name.to_string()+"/Dockerfile";

@@ -12,7 +12,7 @@
     <meta content="telephone=no" name="format-detection"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-    <title>登录卡片-AXUI前端框架|斧子框架，面向设计的自主国产前端框架</title>
+    <title>{{ trans.login.title }}</title>
     <meta name="description"
           content="，AXUI前端框架是面向设计，满足设计多样化需求的前端解决方案，减少或剔除JS文件资源和API。AXUI前端框架原则是能用css写的不用js；能用js写的不用插件；能用插件的不重复引用插件。核心文件只有ax.css和ax.js，加载速度飞快。">
     <meta name="keywords" content=",前端框架,UI,CSS3,HTML5,原生JS,面向设计,前端工程师">
@@ -41,8 +41,8 @@
                 <div class="ax-tab" axTab>
 
                     <ul class="ax-row ax-tab-nav ax-menu-tab">
-                        <a href="###" class="ax-item">登录账号</a>
-                        <a href="###" class="ax-item">注册新用户</a>
+                        <a href="###" class="ax-item">{{trans.login.login_title}}</a>
+                        <a href="###" class="ax-item">{{trans.login.register_title}}</a>
                         <li class="ax-col"></li>
                     </ul>
 
@@ -59,7 +59,7 @@
                                             <div class="ax-form-input"><span class="ax-pos-left" style="width: 2.4rem;"><i
                                                     class="ax-iconfont ax-icon-me-f"></i></span><input name="username"
                                                                                                        value="admin"
-                                                                                                       placeholder="输入登录名称"
+                                                                                                       placeholder="{{trans.login.form.login_label}}"
                                                                                                        type="text"><span
                                                     class="ax-pos-right"><a href="###"
                                                                             class="ax-iconfont ax-icon-close ax-val-none"></a></span>
@@ -76,7 +76,7 @@
                                             <div class="ax-form-input"><span class="ax-pos-left"
                                                                              style="width:2.4rem;"><i
                                                     class="ax-iconfont ax-icon-lock-f"></i></span>
-                                                <input name="password" placeholder="输入密码" type="password"><span
+                                                <input name="password" placeholder="{{trans.login.form.password_label}}" type="password"><span
                                                         class="ax-pos-right"><a href="###"
                                                                                 class="ax-iconfont ax-icon-close ax-val-none"></a></span>
                                             </div>
@@ -94,7 +94,7 @@
                                                     <div class="ax-flex-block">
                                                         <span class="ax-pos-left" style="width:2.4rem;"><i
                                                                 class="ax-iconfont ax-icon-shield-f"></i></span>
-                                                        <input name="username" placeholder="输入验证码..." value=""
+                                                        <input name="captcha" placeholder="{{trans.login.form.captcha_label}}" value=""
                                                                type="text"><span class="ax-pos-right"><a href="###"
                                                                                                          class="ax-iconfont ax-icon-close ax-val-none"></a></span>
                                                     </div>
@@ -133,7 +133,7 @@
                                     <div class="ax-flex-row">
                                         <div class="ax-flex-block">
                                             <div class="ax-form-input">
-                                                <input type="submit" id="submit" class="ax-btn ax-primary ax-full" value="登录"></input>
+                                                <input type="submit" id="submit" class="ax-btn ax-primary ax-full" value="{{trans.login.form.submit_label}}"></input>
                                             </div>
                                         </div>
                                     </div>

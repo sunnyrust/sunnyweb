@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{ trans.message.title }}</title>
+<link href="/css/Iconfont/iconfont.css?{{getversion}}" rel="stylesheet" type="text/css" />
+<style type="text/css">
+	*{ padding: 0; margin: 0; }
+	body{ background: #fff; font-family: '微软雅黑'; color: #333; font-size: 16px; }
+	.system-message{ width:500px;height:120px; margin:auto;border:6px solid #999;text-align:center; position:relative;top:50px;}
+	.system-message legend{font-size:24px;font-weight:bold;color:#999;margin:auto;width:110px;}
+	.system-message h1{ font-size: 100px; font-weight: normal; line-height: 120px; margin-bottom: 12px; }
+	.system-message .jump{ padding-right:10px;height:25px;line-height:25px;font-size:14px;position:absolute;bottom:0px;left:0px;background-color:#e6e6e1 ; display:block;width:490px;text-align:right;}
+	.system-message .jump a{ color: #1890ff;}
+	.system-message .success,.system-message .error{ line-height: 60px; font-size: 15px; }
+	.system-message .detail{ font-size: 12px; line-height: 20px; margin-top: 12px; display:none}
+    .icon-shibai{float: left;font-size: 36px;color: #F5222D;}
+    .icon-chenggong{float: left;font-size: 36px;color: #52C41A;}
+</style>
+</head>
+<body>
+<fieldset class="system-message">
+    <legend>{{jamp_message.title}}</legend>
+    <div style="text-align:left;padding-left:10px;height:60px;width:490px;  ">
+
+        {% if message.status %}
+        <p class="success"><i class="iconfont icon_border icon-chenggong"></i><span style="margin-left:10px;">{{trans.message.congratulations}} ^ _ ^ ! ~{{jamp_message.message}}</span></p>
+        {% else %}
+        <p class="error"><i class="iconfont icon_border icon-shibai"></i><span style="margin-left:10px;">Sorry T _ T ! ~{{jamp_message.message}}</span></p>
+        {% endif %}
+        <p class="detail"></p>
+         
+    </div>
+    <p class="jump">
+        {{trans.message.pageAutomatically}} <a id="href" href="#" onclick="return go_back();">{{trans.message.jump}}</a> {{trans.message.waitingTime}}： <b id="wait">{{jamp_message.wait}}</b>
+    </p>
+</fieldset>
+<script type="text/javascript">
+    function go_back(){
+        const href = "{{jamp_message.url | safe }}",
+        suc='{{jamp_message.staus}}';
+        if (href==="" || href==="#"){
+            // console.debug("empty href")
+            if (suc==='true' && window.top===window){
+                // 成功的顶层页面直接关闭（浏览器限制实现不了）
+                // console.debug("closing window")
+                window.close();
+                return false;
+            }
+            window.history.go(-1);
+        }else{
+            var token="{{jamp_message.platform_token}}";
+            var jumparr = href.split('#');
+            if (token != null || token != undefined){
+                if (href.indexOf("?")!==-1){
+                    //var newhref= jumparr[0]+"&token=" + token + "#jump";
+                    var newhref= jumparr[0];
+                }else{
+                    // var newhref= jumparr[0]+"?token=" + token + "#jump";
+                    var newhref= jumparr[0];
+
+                }
+            }
+            window.location.href = newhref;
+        }
+        return false
+    }
+(function(){
+    var wait = document.getElementById('wait');
+    totaltime=parseInt(wait.innerHTML);
+    var interval = setInterval(function(){
+        var time = --totaltime;
+            wait.innerHTML=""+time;
+        if(time === 0) {
+            go_back()
+            //location.reload();
+            clearInterval(interval);
+        }
+    }, 1000);
+})();   
+ 
+</script>
+</body>
+</html>

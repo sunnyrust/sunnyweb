@@ -1,0 +1,17 @@
+.round {width: 80px;height: 50px;margin: 10px;outline: none;border: none;}
+#M-QA{background: url('/static/Images/rect.png');cursor: pointer;}
+#M-intention{background: url('/static/Images/polygon.png') no-repeat;cursor: pointer;}
+#test{text-align: center;background: #e8e8e8;overflow-y: auto;}
+.mermaid-content{position: relative;}
+.mermaid-head{background: #9FA2A7;}
+.qrow{padding: 20px 20px 0px 20px}
+input,select{width: 100%;height: 26px;border: 1px solid #cccccc;text-indent: 5px;border-radius: 4px;font-size: 14px;}
+label{color: #ffffff;font-size: 13px;}
+#M-qanode,#M-intennode,#M-qaform,#M-agent,#M-line{position: absolute;top: 0px;right: 0px;background: #161719;overflow-y: scroll;height: 100%;width: 0%;overflow-x: hidden;}
+#M-qayes,#M-intenyes,#M-qabutton,#M-agentbutton,#M-linebutton{background: #1890ff;width: 48%;height: 26px;border: none;color: #ffffff;float: left;margin-bottom: 30px;cursor: pointer;}
+.cancel{background: red;width: 48%;height: 26px;border: none;color: #ffffff;margin-left: 4%;float: left;margin-bottom: 30px;cursor: pointer;}
+.scenes_less{background: url('/static/Images/scenes_less.png') no-repeat;width: 20px;height: 20px;cursor: pointer;margin-top: 4px;float: left;}
+.scenes_plus{ background: url('/static/Images/scenes_plus.png') no-repeat;width: 20px;height: 20px;cursor: pointer;margin-top: 4px;margin-right: 40px;float: right;}
+.qaProblem input,.qaAnswer input,.editQaProblem input,.editQaAnswer input{width: 180px;display: inline-block;margin-left: 10px;}
+.qaProblem,.qaAnswer,.editQaProblem,.editQaAnswer {margin-top: 10px;width: 280px;}
+label span{color: red;font-size: 14px;}

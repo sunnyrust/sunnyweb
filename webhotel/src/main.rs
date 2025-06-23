@@ -33,6 +33,7 @@ async fn main() {
     
     let run_mode=cfg.web.runmode.clone();
     let website_name=std::env::var("WEBSITE_NAME").unwrap_or_else(|_| "webhotel".to_string());
+    std::env::set_var("WEBSITE_VERSION", &cfg.web.version);
     if run_mode=="dev"{
        tracing_subscriber::registry()
         .with(

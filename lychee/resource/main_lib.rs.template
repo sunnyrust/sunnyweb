@@ -2,40 +2,72 @@ mod err;
 pub mod config;
 pub mod controller;
 pub mod router;
+pub mod utils;
 // pub mod model;
 use dotenv::dotenv;
 use axum::{
-    http::StatusCode,
+    http::{StatusCode,Uri},
     response::IntoResponse,
     middleware::Next, 
     extract::Request, 
     response::Response
 };
+
 use std::{io};
 use tera::Tera;
-pub async  fn handle_error(_err: io::Error) -> impl IntoResponse {
-    (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
+use std::collections::HashMap;
+use serde_json::Value;
+use lazy_static::lazy_static;
+lazy_static! {
+    pub static ref TRANSLATIONS: HashMap<String, Value> = {
+        let mut translations = HashMap::new();
+        
+        // load English translations
+        if let Ok(content) = std::fs::read_to_string("configs/locales/zh-CN.toml") {
+            if let Ok(parsed) = toml::from_str(&content) {
+                translations.insert("zh".to_string(), parsed);
+            }
+        }
+        // load English translations
+        if let Ok(content) = std::fs::read_to_string("configs/locales/en-US.toml") {
+            if let Ok(parsed) = toml::from_str(&content) {
+                translations.insert("en".to_string(), parsed);
+            }
+        }
+        
+        translations
+    };
 }
 
-use axum::http::Uri;
+pub fn get_translation(lang: &str) -> Option<&Value> {
+    TRANSLATIONS.get(lang)
+}
+
+// app state
+pub struct AppState {
+    pub tera: Tera,
+}
+
 #[derive(Clone)]
 pub struct BaseController {
     pub uri: Uri,
+    pub app_version: String,
 }
 
 impl BaseController {
-    pub fn new(uri: Uri) -> Self {
-        Self { uri }
+    pub fn new(uri: Uri, app_version: String) -> Self {
+        Self { uri, app_version }
     }
 
     pub fn log_request(&self) {
-        println!("Request URI: {}", self.uri.path());
+        println!("Request URI: {}\r\nApp Version: {}", self.uri.path(), self.app_version);
     }
 }
 
 pub async  fn base_controller_middleware(request: Request, next: Next) -> Response {
     let uri = request.uri().clone();
-    let base_controller = BaseController::new(uri);
+    let app_version = std::env::var("WEBSITE_VERSION").unwrap_or_default();
+    let base_controller = BaseController::new(uri,app_version);
 
     // 存储到请求扩展
     let mut request = request;
@@ -55,11 +87,10 @@ pub fn new(website_name:&str)->config::Config{
     dotenv().ok();
     config::Config::from_file("./configs/app.toml").unwrap()
 }
-// app state
-pub struct AppState {
-    pub tera: Tera,
-}
 
+pub async  fn handle_error(_err: io::Error) -> impl IntoResponse {
+    (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
+}
 #[cfg(test)]
 mod tests {
     #[test]

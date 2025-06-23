@@ -40,6 +40,10 @@ r#"
         };
         let run_mode=cfg.web.runmode.clone();
         let website_name="lychee".to_string();
+        unsafe {
+            std::env::set_var("WEBSITE_NAME", &website_name);
+            std::env::set_var("WEBSITE_VERSION", &cfg.web.version);
+        }
         if run_mode=="dev"{
         tracing_subscriber::registry()
             .with(

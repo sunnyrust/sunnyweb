@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>formSelect使用文档 v1.0.4</title>
+    <link rel="stylesheet" href="../assets/layui/css/layui.css">
+    <link rel="stylesheet" href="doc.css">
+</head>
+<body>
+    <div class="layui-container">
+        <div class="layui-row">
+            <h1 class="site-h1">formSelect.js 下拉选择器使用文档</h1>
+            <small>当前版本：v1.0.4</small>
+        </div>
+        <hr>
+        <div class="layui-row" id="quick">
+            <blockquote class="layui-elem-quote">快速使用</blockquote>
+            <p>
+                下载地址：
+                <a href="https://gitee.com/wujiawei0926/treeselect" target="_blank">Gitee(码云)</a> 
+                <a href='https://gitee.com/wujiawei0926/treeselect/stargazers'target="_blank"><img src='https://gitee.com/wujiawei0926/treeselect/badge/star.svg?theme=white' alt='star'></img></a>
+                <a href='https://gitee.com/wujiawei0926/treeselect/members'target="_blank"><img src='https://gitee.com/wujiawei0926/treeselect/badge/fork.svg?theme=white' alt='fork'></img></a>
+            </p>
+            <p>
+                使用文档：
+                <a href="https://gitee.com/wujiawei0926/treeselect" >Gitee Page</a>
+            </p>
+            <p>使用方式：</p>
+            <pre class="layui-code">
+1. 引入layui.js
+&lt;script src=&quot;../assets/layui/layui.js&quot;&gt;&lt;/script&gt;
+
+2. 在页面上添加input
+&lt;input type="text" id="tree" lay-filter="tree" class="layui-input"&lt;
+
+3. 加载formSelect模块
+layui.config({
+    base: &quot;../module/&quot;
+}).extend({
+    treeSelect: &quot;treeSelect/treeSelect&quot;
+});
+
+4. 初始化
+layui.use([&quot;treeSelect&quot;], function () {
+    var treeSelect = layui.treeSelect;
+
+    treeSelect.render({
+        // 选择器
+        elem: '#tree',
+        // 数据
+        data: 'data/data3.json',
+        // 异步加载方式：get/post，默认get
+        type: 'get',
+        // 占位符
+        placeholder: '修改默认提示信息',
+        // 是否开启搜索功能：true/false，默认false
+        search: true,
+        // 一些可定制的样式
+        style: {
+            folder: {
+                enable: true
+            },
+            line: {
+                enable: true
+            }
+        },
+        // 点击回调
+        click: function(d){
+            console.log(d);
+        },
+        // 加载完成后的回调函数
+        success: function (d) {
+            console.log(d);
+//                选中节点，根据id筛选
+            treeSelect.checkNode('tree', 3);
+
+            console.log($('#tree').val());
+
+//                获取zTree对象，可以调用zTree方法
+           var treeObj = treeSelect.zTree('tree');
+           console.log(treeObj);
+
+//                刷新树结构
+           treeSelect.refresh('tree');
+        }
+    });
+});
+            </pre>
+
+        </div>
+        <div class="layui-row" id="param">
+            <blockquote class="layui-elem-quote">参数配置</blockquote>
+            <div class="">
+                <table lay-filter="param-table">
+                    <thead>
+                        <tr>
+                            <th lay-data="{field:'key', sort:true}">属性名</th>
+                            <th lay-data="{field:'name'}">说明</th>
+                            <th lay-data="{field:'default'}">默认值</th>
+                            <th lay-data="{field:'description'}">示例</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>elem</td>
+                            <td>指定原始input的选择器，必填</td>
+                            <td>/</td>
+                            <td>'#input'</td>
+                        </tr>
+                        <tr>
+                            <td>data</td>
+                            <td>异步数据地址，必填</td>
+                            <td>/</td>
+                            <td>'data/data3.json'</td>
+                        </tr>
+                        <tr>
+                            <td>headers</td>
+                            <td>请求头</td>
+                            <td>/</td>
+                            <td>{'token': 'xxx'}</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>异步请求方式：get/post</td>
+                            <td>'get'</td>
+                            <td>'get'</td>
+                        </tr>
+                        <tr>
+                            <td>placeholder</td>
+                            <td>占位符，input的提示文字</td>
+                            <td>'请选择'</td>
+                            <td>'修改默认提示信息'</td>
+                        </tr>
+                        <tr>
+                            <td>search</td>
+                            <td>是否开启搜索：true/false</td>
+                            <td>true</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td>style</td>
+                            <td>样式定制项</td>
+                            <td>/</td>
+                            <td><a href="#style">详见style参数</a></td>
+                        </tr>
+                        <tr>
+                            <td>click</td>
+                            <td>点击回调函数</td>
+                            <td>/</td>
+                            <td><a href="#click">详见click回调</a></td>
+                        </tr>
+                        <tr>
+                            <td>success</td>
+                            <td>渲染完成回调函数</td>
+                            <td>/</td>
+                            <td><a href="#success">详见success回调</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="layui-row" id="style">
+            <blockquote class="layui-elem-quote">样式定制项</blockquote>
+            <p>支持一些简单的样式定制，后期版本将引入三方图标库并支持图标的自定义</p>
+            <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',
+    style: {
+        folder: { // 父节点图标
+            enable: true // 是否开启：true/false
+        },
+        line: { // 连接线
+            enable: true // 是否开启：true/false
+        }
+    },
+});
+            </pre>
+        </div>
+
+
+
+        <div id="callback"></div>
+        <div class="layui-row" id="click">
+            <blockquote class="layui-elem-quote">点击回调</blockquote>
+            <p>树节点被点击时触发，返回一个object参数，携带三个成员：</p>
+            <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',    
+    click: function(d){
+        console.log(d);
+        console.log(d.treeId); // 得到组件的id
+        console.log(d.current); // 得到点击节点的treeObj对象
+        console.log(d.data); // 得到组成树的数据
+    },
+});
+            </pre>
+        </div>
+        <div class="layui-row" id="success">
+            <blockquote class="layui-elem-quote">渲染完成后回调</blockquote>
+            <p>组件渲染完成后触发，返回一个object参数，携带两个成员：</p>
+            <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',    
+    success: function(d){
+        console.log(d);
+        console.log(d.treeId); // 得到组件的id
+        console.log(d.data); // 得到组成树的数据
+    },
+});
+            </pre>
+        </div>
+
+        <div id="function"></div>
+        <div class="layui-row" id="checknode">
+            <blockquote class="layui-elem-quote">选中节点</blockquote>
+            <p>由于该组件采用异步加载机制，因此该方法应保证在渲染完成后再执行</p>
+            <p>需要两个参数，分别为lay-filter的值、节点id（异步加载数据的id）</p>
+            <pre class="layui-code">
+treeSelect.checkNode('tree', 3);
+            </pre>
+            <p>如果需要立即执行，例如更新时默认选中，应在success回调中执行</p>
+            <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',    
+    success: function(d){
+        treeSelect.checkNode('tree', 3);
+    },
+});
+            </pre>
+        </div>
+        <div class="layui-row" id="refresh">
+                <blockquote class="layui-elem-quote">刷新树结构</blockquote>
+                <p>由于该组件采用异步加载机制，因此该方法应保证在渲染完成后再执行</p>
+                <p>需要一个参数，即lay-filter的值</p>
+                <pre class="layui-code">
+treeSelect.refresh('tree');
+                </pre>
+                <p>如果需要立即执行，应在success回调中执行</p>
+                <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',    
+    success: function(d){
+        treeSelect.refresh('tree');
+    },
+});
+            </pre>
+        </div>
+        <div class="layui-row" id="gettreeobj">
+                <blockquote class="layui-elem-quote">获取ZTree对象</blockquote>
+                <p>由于该组件采用异步加载机制，因此该方法应保证在渲染完成后再执行</p>
+                <p>需要一个参数，即lay-filter的值</p>
+                <pre class="layui-code">
+var treeObj = treeSelect.zTree('tree');
+console.log(treeObj);
+                </pre>
+                <p>如果需要立即执行，应在success回调中执行</p>
+                <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',    
+    success: function(d){
+        var treeObj = treeSelect.zTree('tree');
+        console.log(treeObj);
+    },
+});
+            </pre>
+        </div>
+
+        <div class="layui-row" id="destroy">
+            <blockquote class="layui-elem-quote">销毁formSelect组件</blockquote>
+            <p>需要一个参数，即lay-filter的值</p>
+            <pre class="layui-code">
+treeSelect.destroy('tree');
+            </pre>
+            <p>如果需要立即执行，应在success回调中执行</p>
+            <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',    
+    success: function(d){
+        treeSelect.destroy('tree');
+    },
+});
+            </pre>
+        </div>
+        <div class="layui-row" id="revokeNode">
+            <blockquote class="layui-elem-quote">撤销选中的节点</blockquote>
+            <p>需要两个参数，分别为lay-filter的值、回调函数，其中回调函数允许不传</p>
+            <pre class="layui-code">
+treeSelect.revokeNode('tree', function(d){
+    console.log(d);
+    console.log(d.treeId);
+});
+            </pre>
+            <p>如果需要立即执行，应在success回调中执行</p>
+            <pre class="layui-code">
+treeSelect.render({
+    // 选择器
+    elem: '#tree',
+    // 数据
+    data: 'data/data3.json',    
+    success: function(d){
+        treeSelect.revokeNode('tree', function(d){
+            console.log(d);
+            console.log(d.treeId);
+        });
+    },
+});
+            </pre>
+        </div>
+
+
+
+        <div class="layui-row" id="end">
+            <blockquote class="layui-elem-quote">写在最后</blockquote>
+            <p>
+                一个人的力量总是有限的，不能满足所有人的要求。<br>
+                如果您对该组件感兴趣或是觉得代码有改进与调整的地方，欢迎fork。
+            </p>
+        </div>
+    </div>
+
+
+    <div id="menu" style="display: none;">
+        <ul class="site-menu">
+            <li><a href="#quick">快速使用</a></li>
+            <li><a href="#param">参数配置</a></li>
+            <li><a href="#style">样式定制项</a></li>
+            <li>
+                <a href="#callback">回调函数</a>
+                <ul>
+                    <li><a href="#click">点击回调</a></li>
+                    <li><a href="#success">渲染完成回调</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#function">方法一览</a>
+                <ul>
+                    <li><a href="#checknode">选中节点</a></li>
+                    <li><a href="#refresh">刷新树结构</a></li>
+                    <li><a href="#gettreeobj">获取ZTree对象</a></li>
+                    <li><a href="#destroy">销毁</a></li>
+                    <li><a href="#revokeNode">撤销选中的节点</a></li>
+                </ul>
+            </li>
+            <li><a href="#end">写在最后</a></li>
+        </ul>
+    </div>
+
+    <script src="../assets/layui/layui.js"></script>
+    <script>
+        layui.use([ 'form', 'layer', 'code','table'], function () {
+            var form = layui.form,
+                $ = layui.jquery,
+                code = layui.code,
+                table = layui.table,
+                layer = layui.layer;
+
+            layui.code();
+
+            table.init('param-table'); 
+
+            layer.open({
+                type: 1,
+                title: '目录',
+                content: $('#menu'),
+                area: ['185px', '420px'],
+                offset: 'r',
+                shade: false
+            })
+
+        });
+    </script>
+
+    
+</body>
+</html>
