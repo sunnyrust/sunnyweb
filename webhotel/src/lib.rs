@@ -4,11 +4,12 @@
 //! ```
 //!     let web=webhotel::new();
 //! ```
-
-mod err;
 pub mod config;
-pub mod router;
 pub mod controller;
+pub mod dbstate;
+pub mod model;
+pub mod err;
+pub mod router;
 pub mod utils;
 use dotenv::dotenv;
 use axum::{
@@ -21,7 +22,7 @@ use axum::{
 use std::{io};
 use tera::Tera;
 use std::sync::{Arc,Mutex};
-
+use dbstate::DbState;
 
 use std::collections::HashMap;
 use serde_json::Value;
@@ -33,13 +34,13 @@ lazy_static! {
         // load English translations
         if let Ok(content) = std::fs::read_to_string("configs/locales/zh-CN.toml") {
             if let Ok(parsed) = toml::from_str(&content) {
-                translations.insert("zh".to_string(), parsed);
+                translations.insert("zh-CN".to_string(), parsed);
             }
         }
         // load English translations
         if let Ok(content) = std::fs::read_to_string("configs/locales/en-US.toml") {
             if let Ok(parsed) = toml::from_str(&content) {
-                translations.insert("en".to_string(), parsed);
+                translations.insert("en-US".to_string(), parsed);
             }
         }
         
@@ -103,6 +104,7 @@ pub fn new(website_name:&str)->config::Config{
 pub struct AppState {
     pub tera: Tera,
     pub path_segments: Mutex<Vec<String>>,
+    pub db_state: DbState,
 }
 // impl Clone for AppState {
 //     fn clone(&self) -> Self {
@@ -117,6 +119,10 @@ impl Clone for AppState {
         AppState {
             tera: self.tera.clone(), // Tera supports Clone
             path_segments: Mutex::new(self.path_segments.lock().unwrap().clone()), // Lock and clone inner Vec<String>
+            db_state: DbState {
+                conn: self.db_state.conn.clone(), // Assuming PgPool supports Clone
+                redis_conn: self.db_state.redis_conn.clone(), // Assuming Client supports Clone
+            },
         }
     }
 }

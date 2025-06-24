@@ -118,7 +118,7 @@ pub fn new_menu(){
             }
             thread::sleep(millis);
             let use_project_name=lychee_project.clone().name.replace("-", "_");
-            let text_to_insert=format!("use {}::{{config,router,AppState,base_controller_middleware}};",use_project_name);
+            let text_to_insert=format!("use {}::{{config,router,dbstate::DbState,AppState,base_controller_middleware}};",use_project_name);
             let _=insert_text_at_beginning(dir_name.clone(),&text_to_insert);
             // // Modify main.rs
             // dir_name=project_name.to_string()+"/src/main.rs";
@@ -281,6 +281,20 @@ pub fn new_menu(){
                 }
             } else {
                 println!("Src directory does not exist at {}", src_path);
+            }
+            // copy sunny-derive-trait to ./
+            let src_path="./sunny-derive-trait";
+            let target_src_path=project_name.to_string()+"/sunny-derive-trait";
+            if check_file_exists(&src_path) {
+                match copy_dir(src_path, &target_src_path) {
+                    Ok(_) => println!("Copy sunny-derive-trait files successfully.👌"),
+                    Err(e) => {
+                        eprintln!("Error copying sunny-derive-trait files: {}", e);
+                        std::process::exit(0);
+                    },
+                }
+            } else {
+                println!("sunny-derive-trait directory does not exist at {}", src_path);
             }
             // create Dockerfile
             dir_name=project_name.to_string()+"/Dockerfile";

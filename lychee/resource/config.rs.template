@@ -13,10 +13,15 @@ pub struct RedisConfig {
     pub password: String,
     pub with_secure: bool,
 }
-
+#[derive(Deserialize)]
+pub struct DbConfig {
+    pub pg:String,
+    pub connections:u32,
+}
 #[derive(Deserialize)]
 pub struct Config {
     pub web: WebConfig,
+    pub db: DbConfig,
     pub redis: RedisConfig,
 }
 impl Config {

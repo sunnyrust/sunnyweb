@@ -2,7 +2,7 @@ use tower_http::{
     services::{ServeDir},
     // trace::TraceLayer,
 };
-use webhotel::{config,router,AppState,base_controller_middleware};
+use webhotel::{config,router,dbstate::DbState,AppState,base_controller_middleware};
 use tera::Tera;
 use axum::{
     // http::StatusCode,
@@ -19,6 +19,7 @@ use tower_sessions::{SessionManagerLayer};
 // use tower_sessions::MemoryStore; // In production, migrate to persistent storage such as Redis.
 use tower_sessions_redis_store::{fred::prelude::*,RedisStore}; // In production, migrate to persistent storage such as Redis.
 use std::sync::{Arc,Mutex};
+use sqlx::postgres::PgPoolOptions;
 // use tokio::sync::Mutex;
 #[tokio::main]
 async fn main() {
@@ -75,18 +76,24 @@ async fn main() {
     let images_dir = ServeDir::new("./static/images");
     // init app state
     let tera = Tera::new("templates/**/*").unwrap();
-
-    let app_state = AppState { tera, path_segments: Mutex::new(vec![]) };
+    let redis_url = format!(
+        "redis://:{}@{}:{}",
+        cfg.redis.password.clone(),
+        cfg.redis.host.clone(),
+        cfg.redis.port.clone(),
+    );
+    // 连接postgresql
+    let db_pool = PgPoolOptions::new()
+        .max_connections(cfg.db.connections)
+        .connect(&cfg.db.pg).await.unwrap();
+    // 连接redis
+    let redis_client=redis::Client::open(redis_url.clone()).expect("Redis Database connect error");
+    let app_state = AppState { tera, path_segments: Mutex::new(vec![]), db_state: DbState { conn: db_pool, redis_conn: redis_client } };
 
     // ‌Initialize session storage (in-memory storage, for demonstration purposes only).
     // let session_store = MemoryStore::default();
     
-    let redis_url = format!(
-            "redis://:{}@{}:{}",
-            cfg.redis.password.clone(),
-            cfg.redis.host.clone(),
-            cfg.redis.port.clone(),
-        );
+   
     // let pool = Pool::new(Config::new(redis_url), None, None, None, 6).unwrap();
     let pool = Pool::new(tower_sessions_redis_store::fred::prelude::Config::from_url(&redis_url).unwrap(), None, None, None, 6).unwrap();
     let redis_conn = pool.connect();
@@ -108,6 +115,8 @@ async fn main() {
     // .with_domain("example.com");
 
     // let session_layer = SessionManagerLayer::new(session_store);
+    
+
     let app=router::init()
         .nest_service("/static", serve_dir.clone())
         .nest_service("/css", css_dir.clone())

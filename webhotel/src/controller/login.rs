@@ -71,7 +71,7 @@ pub async fn login(
         let captcha_image = generate_captcha_image(session).await;
         ctx.insert("captcha_image", &captcha_image);
         ctx.insert("error", "验证码错误");
-        if let Some(trans) = get_translation("en") {
+        if let Some(trans) = get_translation("en-US") {
             ctx.insert("trans", trans);
         }
         Err(Html(state.tera.render("common/message.html", &ctx).unwrap()))
@@ -107,7 +107,7 @@ async fn render_login(
     ctx.insert("password", "pass");
     let captcha_image = generate_captcha_image(session).await;
     ctx.insert("captcha_image", &captcha_image);
-    if let Some(trans) = get_translation("en") {
+    if let Some(trans) = get_translation("zh-CN") {
         ctx.insert("trans", trans);
     }
 

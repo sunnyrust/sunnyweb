@@ -24,7 +24,7 @@ note = "Comment"
 userList = "User List"
 addUser = "Add User"
 toolong = "User name is too long, please re-enter"
-role = "role
+role = "role"
 user = "User"
 user_title = "User Management Page"
 [login]

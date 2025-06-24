@@ -1,6 +1,8 @@
 mod err;
 pub mod config;
 pub mod controller;
+pub mod dbstate;
+pub mod model;
 pub mod router;
 pub mod utils;
 // pub mod model;
@@ -12,7 +14,7 @@ use axum::{
     extract::Request, 
     response::Response
 };
-
+use dbstate::DbState;
 use std::{io};
 use tera::Tera;
 use std::collections::HashMap;
@@ -25,13 +27,13 @@ lazy_static! {
         // load English translations
         if let Ok(content) = std::fs::read_to_string("configs/locales/zh-CN.toml") {
             if let Ok(parsed) = toml::from_str(&content) {
-                translations.insert("zh".to_string(), parsed);
+                translations.insert("zh-CN".to_string(), parsed);
             }
         }
         // load English translations
         if let Ok(content) = std::fs::read_to_string("configs/locales/en-US.toml") {
             if let Ok(parsed) = toml::from_str(&content) {
-                translations.insert("en".to_string(), parsed);
+                translations.insert("en-US".to_string(), parsed);
             }
         }
         
@@ -46,6 +48,19 @@ pub fn get_translation(lang: &str) -> Option<&Value> {
 // app state
 pub struct AppState {
     pub tera: Tera,
+    pub db_state: DbState,
+}
+
+impl Clone for AppState {
+    fn clone(&self) -> Self {
+        AppState {
+            tera: self.tera.clone(), // Tera supports Clone
+            db_state: DbState {
+                conn: self.db_state.conn.clone(), // Assuming PgPool supports Clone
+                redis_conn: self.db_state.redis_conn.clone(), // Assuming Client supports Clone
+            },
+        }
+    }
 }
 
 #[derive(Clone)]
