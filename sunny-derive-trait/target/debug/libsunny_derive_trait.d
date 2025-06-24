@@ -1,1 +1,0 @@
-/home/sunny/work/rust/bible/src/08/sunny-marco/sunny-derive-trait/target/debug/libsunny_derive_trait.rlib: /home/sunny/work/rust/bible/src/08/sunny-marco/sunny-derive-trait/src/lib.rs /home/sunny/work/rust/bible/src/08/sunny-marco/sunny-derive-trait/sunny-derive/src/lib.rs
