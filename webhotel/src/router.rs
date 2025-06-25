@@ -11,5 +11,6 @@ pub fn init() -> axum::Router {
         .route("/", get(move || async move { 
             format!("🌱🌎 I'm lying flat.🌐🌱\r\n🌱🌎 I'm locking down in webhotel.🌐🌱\r\n🌱🌎 The web project's name is {}.🌐🌱", website_name_root)
          }))
-        .nest("/login", controller::login::login_router())
+        .nest("/login", controller::login::router())
+        .nest("/index", controller::index::router())
 }

@@ -3,7 +3,7 @@
     version="0.1.0"
     runmode="dev"  # dev or prod
 [db]
-    pg="postgres://sa:123456@localhost/helloworld"
+    pg="postgres://sa:123456@localhost/lychee"
     connections=10
 [redis]
     host="127.0.0.1"

@@ -159,7 +159,7 @@ pub fn new_menu(){
                 match copy_file(&dir_name,project_name.to_string()+"/src/config.rs"){
                     Ok(_) => println!("Create  config.rs successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying file: {}", e);
+                        eprintln!("Error copying file: {}❌️", e);
                         std::process::exit(0);
                     },
                 }
@@ -168,6 +168,16 @@ pub fn new_menu(){
                 let content = std::str::from_utf8(app.data.as_ref()).unwrap();
                 let _=create_file_from_str(project_name.to_string()+"/src/config.rs",content.as_bytes(),"Create  config.rs successfully.👌".to_string());
             }
+            // copy run.sh
+            dir_name="./resource/run.sh".to_string();
+            match copy_file(&dir_name,project_name.to_string()+"/run.sh"){
+                Ok(_) => println!("Create  run.sh successfully.👌"),
+                Err(e) => {
+                    eprintln!("Error copying file: {}❌️", e);
+                    std::process::exit(0);
+                },
+            }
+            thread::sleep(millis);
             // create lib.rs
             dir_name="./resource/main_lib.rs.template".to_string();
             if check_file_exists(&dir_name){

@@ -9,6 +9,7 @@ description = "webhotel is a web framework."
 
 [dependencies]
 askama = "0.14"
+async-trait = "0.1.88"
 axum = "0.8"
 captcha-rs = "0.2.11"
 # axum-extra = { version = "0.4.2", features = ["spa"] }
@@ -29,3 +30,4 @@ sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio-rustls", "runti
 sunny-derive-trait = { path = "../sunny-derive-trait" }
 sunny-derive = { path = "../sunny-derive-trait/sunny-derive" }
 redis = { version = "0.32.2", features = ["tokio-comp", "cluster", "json"] }
+

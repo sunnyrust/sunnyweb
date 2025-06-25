@@ -96,7 +96,7 @@ pub fn new(website_name:&str)->config::Config{
     }
 
     dotenv().ok();
-    config::Config::from_file("./webhotel.toml").unwrap()
+    config::Config::from_file("./configs/webhotel.toml").unwrap()
 }
 
 
@@ -126,6 +126,9 @@ impl Clone for AppState {
         }
     }
 }
+
+pub use err::{AppError, AppErrorType};
+pub type Result<T> = std::result::Result<T, crate::AppError>;
 // #[cfg(test)]
 mod tests {
     #[test]

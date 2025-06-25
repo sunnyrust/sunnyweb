@@ -1,4 +1,5 @@
 pub mod login;
+pub mod index;
 use crate::AppState;
 #[allow(dead_code)]
 /// get app state

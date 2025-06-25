@@ -14,7 +14,7 @@ use std::sync::Arc;
 use tera::{ Context};
 use tower_sessions::{Session};
 use serde::Deserialize;
-pub fn login_router() -> Router {
+pub fn router() -> Router {
     Router::new()
         .route("/login", get(render_login))
         .route("/login", post(login))
