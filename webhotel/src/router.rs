@@ -13,4 +13,5 @@ pub fn init() -> axum::Router {
          }))
         .nest("/login", controller::login::router())
         .nest("/index", controller::index::router())
+        .nest("/user", controller::user::router())
 }

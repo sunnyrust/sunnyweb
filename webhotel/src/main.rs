@@ -2,7 +2,7 @@ use tower_http::{
     services::{ServeDir},
     // trace::TraceLayer,
 };
-use webhotel::{config,router,dbstate::DbState,AppState,base_controller_middleware};
+use webhotel::{config,router,utils,dbstate::DbState,AppState,base_controller_middleware};
 use tera::Tera;
 use axum::{
     // http::StatusCode,
@@ -75,7 +75,10 @@ async fn main() {
     let js_dir = ServeDir::new("./static/js");
     let images_dir = ServeDir::new("./static/images");
     // init app state
-    let tera = Tera::new("templates/**/*").unwrap();
+    let mut tera = Tera::new("templates/**/*").unwrap();
+    // 注册自定义函数
+    tera.register_function("check_is_href", utils::template::CheckIsHrefFunction);
+    tera.register_function("check_power", utils::template::CheckPowerFunction);
     let redis_url = format!(
         "redis://:{}@{}:{}",
         cfg.redis.password.clone(),

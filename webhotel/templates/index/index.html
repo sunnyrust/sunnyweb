@@ -138,7 +138,7 @@
         /* Content 样式 */
         .content {
             flex: 1;
-            padding: 20px;
+            padding: 10px; /* 修改为0，去除内边距 */
             background-color: var(--content-bg);
             color: var(--text-color);
         }
@@ -166,6 +166,14 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* 添加iframe样式 */
+        .embedded-page {
+            width: 100%;
+            height: 100%;
+            border: none; /* 去除边框 */
+            min-height: calc(100vh - 100px); /* 减去banner高度 */
+        }
     </style>
 </head>
 <body class="sky-theme">
@@ -190,7 +198,8 @@
             <ul>
                 <li><a href="#"  data-page="user">用户</a></li>
                 <li><a href="/login/login" target="_blank" class="external-link">Login</a></li>
-                <li><a href="/user/add"  data-page="user_add">用户添加</a></li>
+                <li><a href="#" data-page="form" onclick="loadFormPage('/user/add')">用户添加</a></li>
+                <li><a href="#" data-page="form" onclick="loadFormPage('/user/list')">用户修改</a></li>
                 <li><a href="#" data-page="news">新闻动态</a></li>
                 <li><a href="#" data-page="contact">联系我们</a></li>
             </ul>
@@ -202,17 +211,29 @@
             <p>这里是内容区域，您可以在这里放置各种信息、文章、图片等内容。</p>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
             <p>Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
+            <p>
+                {% set link = check_is_href(url=usr.some_url, target=usr.some_target, is_power=usr.has_power) %}
+                {{ link | safe }}
+            </p>
         </div>
     </div>
 
     <script>
+        // 切换主题函数
         function changeTheme() {
             const themeSelect = document.getElementById('themeSelect');
             const selectedTheme = themeSelect.value;
             document.body.className = selectedTheme;
         }
+
+        // 加载表单页面到iframe
+        function loadFormPage(url) {
+            event.preventDefault();
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `<iframe class="embedded-page" src="${url}"></iframe>`;
+        }
         
-        /// 模拟从后台获取不同页面内容
+        // 模拟从后台获取不同页面内容
         function fetchPageContent(page) {
             // 这里模拟不同页面的返回数据
             const pageContents = {
@@ -235,6 +256,10 @@
                 contact: {
                     title: "联系我们",
                     content: "<p>您可以通过以下方式联系我们：</p><p>电话：123-456-7890</p><p>邮箱：contact@example.com</p>"
+                },
+                form: {
+                    title: "用户表单",
+                    content: '<iframe class="embedded-page" src="/user/add"></iframe>'
                 }
             };
             
@@ -255,7 +280,7 @@
             themeSelect.value = 'sky-theme'; // 默认选中绿色主题
             
             // 获取所有菜单链接和内容区域
-            const menuLinks = document.querySelectorAll('.menu a:not(.external-link)');
+            const menuLinks = document.querySelectorAll('.menu a:not(.external-link):not([onclick])');
             const contentArea = document.getElementById('content-area');
             
             // 为所有非外部链接菜单项添加点击事件
@@ -274,7 +299,7 @@
                         
                         // 更新内容区域
                         contentArea.innerHTML = `
-                            <h2>${response.title}</h2>
+                            ${page === 'form' ? '' : `<h2>${response.title}</h2>`}
                             ${response.content}
                         `;
                     } catch (error) {

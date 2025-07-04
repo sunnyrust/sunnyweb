@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>{{tran.editor.user_title}}</title>
+    <title>{{trans.editor.user_title}}</title>
     <link rel="stylesheet" href="/css/Iconfont/iconfont.css"/>
     <link rel="stylesheet" href="/css/public_blue_form.css"/>
     <link rel="stylesheet" href="/css/public_blue.css?{{getversion}}">
@@ -14,61 +14,95 @@
 	<!--自定义样式-->
 	<link href="/css/select/css/themes/select-mania-theme-darkblue.css" rel="stylesheet" type="text/css">
 	<link href="/css/select/css/themes/select-mania-theme-square.css" rel="stylesheet" type="text/css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+    .row {
+    position: relative;
+    display: inline-block;
+    }
+
+    .row input {
+    padding-right: 30px;
+    }
+
+    .clear-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ccc;
+    cursor: pointer;
+    display: none;
+    }
+
+    .clear-icon:hover {
+    color: #999;
+    }
+    </style>
 </head>
 <body>
 <div class="ajax_background"></div>
 <div id="ajax_loading">
     <img src="/images/ajax-loader.gif" alt="loading"/>
 </div>
-<form method="post" name="form" enctype="multipart/form-data" id="form" autocomplete="off">
+
+<form method="post" name="form" enctype="application/x-www-form-urlencoded" id="form" autocomplete="off">
     <div class="form-box">
         <div class="form-head">
             <i class="iconfont icon-jilu"></i>
             {%if  action_name == "Add" %}
-                {{tran.common.add}}
+                {{trans.common.add}}
             {% else %}
-                {{tran.common.edit}}
+                {{trans.common.edit}}
             {% endif %}
-            {{tran.common.user}}
+            {{trans.editor.user}}
             <button class="form-btn btn-red mar-left" type="button"
-                    onclick="location.href='/editor/list'">{{tran.common.cancel}}</button>
+                    onclick="location.href='/user/list'">{{trans.common.cancel}}</button>
             <button class="form-btn btn-green" type="submit" name="submit"
-                    id="submit">{{tran.common.save_deposit}}</button>
+                    id="submit">{{trans.common.save_deposit}}</button>
         </div>
         <div class="form-body">
             <div class="row">
                 <label for="username" class="form_labelText col-3"><span
-                            class="required">*</span>{{tran.common.username}}：</label>
-                <input type="hidden" name="avatarurl" value="{{editor.avatar}}"/>
-                <input type="hidden" name="id" value="{{editor.id}}"/>
-                <input type="text" name="username" id="username" value="{{editor.username}}"
-                       {%if  action_name == "Add" %}disabled="disabled"{% endif %} class="form_text col-13"/>
+                            class="required">*</span>{{trans.common.username}}：</label>
+                <input type="hidden" name="id" value="{{user.id | default(value=0)}}"/>
+                <input type="text" name="username" id="username" value="{{user.username}}"
+                {%if  action_name != "Add" %}disabled="disabled"{% endif %} class="form_text col-13"/>
+                <i class="fas fa-times-circle clear-icon" id="clearIcon"></i>             
             </div>
             <div class="row">
                 <label for="password" class="form_labelText col-3">{%if  action_name == "Add" %}
-                        <span class="required">*</span>{% endif %}{{tran.common.password}}：</label>
+                        <span class="required">*</span>{% endif %}{{trans.common.password}}：</label>
                 <input name="password" type="password" id="password" class="form_text col-13"/>
+                
             </div>
             <div class="row">
                 <label for="re_password" class="form_labelText col-3">{%if  action_name == "Add" %}
-                        <span class="required">*</span>{% endif %}{{tran.editor.repeatPassword}}：</label>
+                        <span class="required">*</span>{% endif %}{{trans.editor.repeatPassword}}：</label>
                 <input name="re_password" type="password" id="re_password" class="form_text col-13"/>
             </div>
             <div class="row">
-                <label for="name" class="form_labelText col-3">{{tran.common.name}}：</label>
-                <input type="text" name="name" id="name" value="{{editor.name}}" class="form_text col-13"/>
+                <label for="name" class="form_labelText col-3">{{trans.common.name}}：</label>
+                <input type="text" name="name" id="name" value="{{user.name}}" class="form_text col-13"/>
             </div>
             <div class="row">
-                <label for="re_password" class="form_labelText col-3">Email：</label>
-                <input name="email" type="email" id="email" class="form_text col-13" value="{{editor.email}}"/>
+                <label for="email" class="form_labelText col-3">{{trans.editor.email}}：</label>
+                <input name="email" type="email" id="email" class="form_text col-13" value="{{user.email}}"/>
             </div>
-            
+            <div class="row">
+                <label for="is_active" class="form_labelText col-3">{{trans.editor.is_active}}：</label>
+                {%if  action_name == "Add" %}
+                    <input name="is_active" type="checkbox" id="is_active" class="form_text col-1" checked="checked" />
+                {% else %}
+                    <input name="is_active" type="checkbox" id="is_active" class="form_text col-1" {%if user.is_active %}checked{% endif %}/>
+                {% endif %}
+                
+            </div>
             <!-- 弹框结束 -->
             <div class="row">
-                <label for="description" class="form_labelText col-3">{{tran.editor.note}}：</label>
+                <label for="description" class="form_labelText col-3">{{trans.editor.note}}：</label>
                 <textarea class="form_textarea col-13" name="description" id="description"
-                          maxlength="250">{{editor.description}}</textarea>
+                          maxlength="250">{{user.description}}</textarea>
             </div>
         </div>
     </div>
@@ -168,7 +202,7 @@
                 re_password: {
                     "required": true,
                 },
-                {{else}}
+                {% else %}
                 password: {
                     required: function () {
                         var rp = $("#re_password").val();
@@ -202,19 +236,32 @@
             },
             messages: {
                 username: {
-                    required: '{{tran.editor.prompt_information}}',
-                    maxlength: '{{tran.editor.toolong}}',
-                    chineseValidate: '{{tran.editor.chineseValidate}}'
+                    required: '{{trans.editor.prompt_information}}',
+                    maxlength: '{{trans.editor.toolong}}',
+                    chineseValidate: '{{trans.editor.chineseValidate}}'
                 },
-                re_password: '{{tran.editor.passwordEmptyT}}',
+                re_password: '{{trans.editor.passwordEmptyT}}',
                 password: {
-                    required: '{{tran.editor.passwordEmpty}}',
-                    equalTo: '{{tran.editor.passwordMatch}}',
-                    minlength: '{{tran.editor.passwordMatch6}}',
+                    required: '{{trans.editor.passwordEmpty}}',
+                    equalTo: '{{trans.editor.passwordMatch}}',
+                    minlength: '{{trans.editor.passwordMatch6}}',
                 },
-                email:'{{tran.editor.checkEmail}}',
+                email:'{{trans.editor.checkEmail}}',
             }
         });
+    });
+
+    const searchInput = document.getElementById('username');
+    const clearIcon = document.getElementById('clearIcon');
+
+    searchInput.addEventListener('input', function() {
+    clearIcon.style.display = this.value ? 'block' : 'none';
+    });
+
+    clearIcon.addEventListener('click', function() {
+    searchInput.value = '';
+    clearIcon.style.display = 'none';
+    searchInput.focus();
     });
 </script>
 </html>

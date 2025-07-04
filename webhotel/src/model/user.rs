@@ -16,7 +16,9 @@ pub struct Model {
     pub name: String,
     pub password_hash: String,
     pub email:String,
-    pub is_parent:bool,
+    pub username:String,
+    pub description:String,
+    pub is_active:bool,
 }
 impl Default for Model {
     fn default() -> Self {
@@ -25,7 +27,9 @@ impl Default for Model {
             name: String::new(),
             password_hash: String::new(),
             email: String::new(),
-            is_parent: false,
+            username: String::new(),
+            description: String::new(),
+            is_active: false,
         }
     }
 }

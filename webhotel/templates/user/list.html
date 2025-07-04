@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>{{ trans.editor.list.userList }}</title>
+    <link rel="stylesheet" href="/css/public_blue.css?{{getversion}}">
+    <link rel="stylesheet" href="/css/Iconfont/iconfont.css?">
+    <style>
+        .ajax_background {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            position: absolute;
+            display: none;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+
+        .changeGroup {
+            top: -3px;
+            color: #666;
+        }
+
+        .modal {
+            width: 800px;
+            height: 600px;
+            background: #ffffff;
+            position: absolute;
+            left: 50%;
+            margin-left: -450px;
+            box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            z-index: 9999;
+            overflow-y: auto;
+            overflow-x: auto;
+            top: 5%;
+            display: none;
+        }
+
+        .modal-background {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            position: absolute;
+            display: none;
+            top: 0;
+            left: 0;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .modal-headers .close {
+            float: right;
+            margin: 18px;
+            width: 14px;
+            cursor: pointer;
+        }
+
+        .modal-headers .close:hover {
+            opacity: 0.6;
+        }
+
+        .modal-footer {
+            height: 50px;
+            width: 100%;
+            border-top: 1px solid #eeeeee;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .button_yes, .button_no {
+            width: 60px;
+            line-height: 30px;
+            height: 30px;
+            border-radius: 4px;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            float: right;
+            margin: 10px;
+        }
+
+        .button_yes {
+            background: #1890ff;
+        }
+
+        .button_no {
+            background: #cf1322;
+        }
+        .tab_groups{
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="ajax_background"></div>
+<div class="box-content">
+    <div class="box-head">
+        <div class="head_title">{{ trans.editor.list.userList }}</div>
+        <div class="head_btn">
+            {% if check_power(controller="posts", action="edit", id=user.id) %}
+                <a href="/user/add">{{ trans.editor.addUser }}</a>
+            {% endif %}
+        </div>
+    </div>
+   <!-- <div class="box-search">
+        <form name="search_form" class="search_form">
+            <div class="area">
+                <label for="em_id">{{ trans.common.username }}：</label>
+                <input onkeyup="ValidateValue(this)" value="{{user.name}}" type="text" name="name" placeholder='{{trans.common.username }}'
+                       class="equipment_id" id="name" autocomplete="off">
+            </div>
+        </form>
+    </div>-->
+    <div class="box-body">
+        <table class="tab_pub" id="tb-1">
+            <thead>
+            <tr class="row tab_rows1">
+                <th class="td_center">ID</th>
+                <th>{{ trans.common.username }}</th>
+                <th>{{ trans.common.name }}</th>
+                <th>{{ trans.editor.email }}</th>
+                <th>{{ trans.editor.is_active }}</th>
+                <th class="td_center">{{ trans.common.operation }}</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for elem in user_list %}
+            <tr class="row rows_rest">
+                <td class="td_center">{{elem.id}}</td>
+                <td class="td_title">{{elem.name}}</td>
+                <td class="td_title">
+                    {% if check_power(controller="editor", action="edit", id=1) %}
+                        <a href="/editor/edit/id/{{ elem.id }}" class="rows_hover">{{ elem.username }}</a>
+                    {% else %}
+                        {{ elem.username }}
+                    {% endif %}
+                </td>
+                <td>{{elem.email}}</td>
+                <td>{{elem.is_active}}</td>
+                <td>Operation</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="box-footer">
+            <div id="page_extra">
+                {{1}}{{trans.page.rows}} <span
+                        id="page_num">{{1}}</span>{{trans.page.page}}
+                <input type="text" id="page_skip" placeholder='{{trans.page.jump}}' autocomplete="off"/>
+                <button id="page_sBtn">Go</button>
+            </div>
+            <ul class="page-nav" id="page"></ul>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap-paginator.min.js"></script>
+<script type="text/javascript" src="/js/main.js?{{getversion}}"></script>
+<script type="text/javascript" src="/js/ValidateValue/ValidateValue.js"></script>
+<script>
+    function removeEditor(id) {
+        if (confirm("{{trans.common.confirm_deletion}}？")) {
+            location.href = "/editor/del/id/" + id;
+        }
+    }
+
+    let user = null
+    var editorJs = {
+        bootsPage: function () {
+            //var total = "{.Page.TotalPage}";
+            //var curPage = '{.Page.PageNo}';
+            var total = 1;
+            var curPage = 1;
+            var tipArr = ['{{trans.page.err1}}', '{{trans.page.err2}}', '{{trans.page.err3}}'];
+
+            //搜索之后的分页逻辑分别处理
+            function hrefn(page) {
+                var name = $('#name').val();
+                var tenantcode = $('#tenantcode').val();
+                window.location.href = "/editor/list/?p=" + page + "&name=" + name + "&tenantcode=" + tenantcode;
+            }
+
+            //调用main.js的page方法
+            Ai_ServerJs.page(total, curPage, tipArr, hrefn);
+        },
+        submit: function () {
+            $("#submit_form").click(function () {
+                var name = $('#name').val();
+                var tenantcode = $('#tenantcode').val();
+                window.location.href = "/editor/list/?p=" + page + "&name=" + name + "&tenantcode=" + tenantcode;
+
+            });
+        },
+        modelShow: function () {
+            $('.changeGroup').click(function () {
+                user = this.id
+                $('.ajax_background').show();
+                $('.modal').show();
+            })
+            $('.close').click(function () {
+                $('.ajax_background').hide();
+                $('.modal').hide();
+            })
+        },
+        checkRadio:function(){
+            $('.tab_groups').click(function(){
+                if($(this).hasClass('checkedGruops')){
+                    $(this).find('input').prop('checked',false);
+                    $(this).removeClass('checkedGruops');
+                }else{
+                    $(this).find('input').prop('checked',true);
+                    $(this).addClass('checkedGruops');
+                }
+                
+            })
+        },
+        changeGroup:function(){//判断是否选中组长
+           $('.changeGroup').click(function(){
+            var fid = $(this).attr('creator');
+            $('.move_id input').each(function(){
+                if($(this).val() == fid){
+                    $(this).attr('checked',true);
+                }else{
+                    $(this).attr('checked',false);
+                }
+            })
+           })
+        }
+    }
+
+    for (var i in editorJs) {
+        if (typeof editorJs[i] == 'function') {
+            editorJs[i]();
+        }
+    }
+
+    $("#savetrainerleader").on("click", function () {
+        let ra = $("input[name='trainleader']:checked")
+        if (ra.length == 1) {
+            let leader = ra.val();
+            let leadername = ra[0].getAttribute("leader")
+            if (leader == undefined) {
+                alert("请选择组长")
+                return
+            }
+            if (user == undefined) {
+                alert("请选择组员")
+                return
+            }
+            $.ajax({
+                type: "post",
+                url: "/editor/choosetrainerleader",
+                data: {
+                    leader: leader,
+                    user: user
+                },
+                success: function (res) {
+                    if (res && res.status) {
+                        $('.ajax_background').hide();
+                        $('.modal').hide();
+                        alert("组长指定成功，指定为：" + leadername)
+                    } else {
+                        alert(res.msg)
+                    }
+                },
+                fail: function (res) {
+                    alert(res)
+                }
+            });
+        }
+
+    })
+</script>
+</html>

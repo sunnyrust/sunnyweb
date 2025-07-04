@@ -118,7 +118,7 @@ pub fn new_menu(){
             }
             thread::sleep(millis);
             let use_project_name=lychee_project.clone().name.replace("-", "_");
-            let text_to_insert=format!("use {}::{{config,router,dbstate::DbState,AppState,base_controller_middleware}};",use_project_name);
+            let text_to_insert=format!("use {}::{{config,router,dbstate::DbState,utils,AppState,base_controller_middleware}};",use_project_name);
             let _=insert_text_at_beginning(dir_name.clone(),&text_to_insert);
             // // Modify main.rs
             // dir_name=project_name.to_string()+"/src/main.rs";
