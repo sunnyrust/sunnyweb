@@ -36,11 +36,11 @@ impl std::fmt::Display for AppError {
 
 impl std::error::Error for AppError {}
 
-// impl From<askama::Error> for AppError {
-//     fn from(err: askama::Error) -> Self {
-//         Self::from_err(Box::new(err), AppErrorType::Template)
-//     }
-// }
+impl From<askama::Error> for AppError {
+    fn from(err: askama::Error) -> Self {
+        Self::from_err(Box::new(err), AppErrorType::Template)
+    }
+}
 
 impl axum::response::IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {

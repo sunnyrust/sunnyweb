@@ -42,6 +42,7 @@
     login_label = "Input user name"
     password_label = "Input password"
     submit_label = "Login"
+    captcha_error = "Incorrect verification code"
 [message]
     congratulations = "Congratulation"
     pageAutomatically = "Auto page"

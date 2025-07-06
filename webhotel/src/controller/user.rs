@@ -79,21 +79,21 @@ pub struct UserAddForm {
     pub email: String,
     pub username: String,
     pub description: String,
-    pub is_active: bool,
+    pub is_active: Option<String>,
 }
 /// insert a new user
 async fn insert_one(
     Extension(state): Extension<Arc<AppState>>,
     Extension(base_controller): Extension<BaseController>,
-    session: Session,
     Form(user): Form<UserAddForm>,
-) -> Result<Html<String>> {
+) -> Result<crate::utils::types::HtmlResponse> {
     tracing::info!("User Add……😀");
     let mut ctx = Context::new();
     if let Some(trans) = get_translation("zh-CN") {
         ctx.insert("trans", trans);
     }
-
+    let is_active = user.is_active.is_some();
+    tracing::info!("is_active:{}", is_active);
     ctx.insert("getversion", base_controller.app_version.as_str());
     ctx.insert("user", &user);
     let state = get_app_state(&state);

@@ -1,7 +1,7 @@
 use serde_json::json;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct JampSessage{
+pub struct JumpMessage{
     pub title : String, //标题
     pub staus : bool, //true表示成功，false表示失败
     pub wait : i32, //等待时间

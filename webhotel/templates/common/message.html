@@ -21,25 +21,25 @@
 </head>
 <body>
 <fieldset class="system-message">
-    <legend>{{jamp_message.title}}</legend>
+    <legend>{{jump_message.title}}</legend>
     <div style="text-align:left;padding-left:10px;height:60px;width:490px;  ">
 
         {% if message.status %}
-        <p class="success"><i class="iconfont icon_border icon-chenggong"></i><span style="margin-left:10px;">{{trans.message.congratulations}} ^ _ ^ ! ~{{jamp_message.message}}</span></p>
+        <p class="success"><i class="iconfont icon_border icon-chenggong"></i><span style="margin-left:10px;">{{trans.message.congratulations}} ^ _ ^ ! ~{{jump_message.message}}</span></p>
         {% else %}
-        <p class="error"><i class="iconfont icon_border icon-shibai"></i><span style="margin-left:10px;">Sorry T _ T ! ~{{jamp_message.message}}</span></p>
+        <p class="error"><i class="iconfont icon_border icon-shibai"></i><span style="margin-left:10px;">Sorry T _ T ! ~{{jump_message.message}}</span></p>
         {% endif %}
         <p class="detail"></p>
          
     </div>
     <p class="jump">
-        {{trans.message.pageAutomatically}} <a id="href" href="#" onclick="return go_back();">{{trans.message.jump}}</a> {{trans.message.waitingTime}}： <b id="wait">{{jamp_message.wait}}</b>
+        {{trans.message.pageAutomatically}} <a id="href" href="#" onclick="return go_back();">{{trans.message.jump}}</a> {{trans.message.waitingTime}}： <b id="wait">{{jump_message.wait}}</b>
     </p>
 </fieldset>
 <script type="text/javascript">
     function go_back(){
-        const href = "{{jamp_message.url | safe }}",
-        suc='{{jamp_message.staus}}';
+        const href = "{{jump_message.url | safe }}",
+        suc='{{jump_message.staus}}';
         if (href==="" || href==="#"){
             // console.debug("empty href")
             if (suc==='true' && window.top===window){
@@ -50,7 +50,7 @@
             }
             window.history.go(-1);
         }else{
-            var token="{{jamp_message.platform_token}}";
+            var token="{{jump_message.platform_token}}";
             var jumparr = href.split('#');
             if (token != null || token != undefined){
                 if (href.indexOf("?")!==-1){

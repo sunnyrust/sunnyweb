@@ -45,9 +45,7 @@ pub async fn login(
     let message = format!("😀Login attempt: username:{:?},password:{:?},captcha:{:?}\r\n😀Captcha text from session: {}", form.username, form.password, form.captcha, captcha_text);
     
     tracing::info!(message);
-    // (StatusCode::OK, message)
-    // insert jamp page information
-    let mut jamp_message = message::JampSessage {
+    let mut jump_message = message::JumpMessage {
         title: "Login".to_string(),
         staus: true,
         wait: 3,
@@ -59,22 +57,23 @@ pub async fn login(
     let mut ctx = Context::new();
     ctx.insert("getversion", base_controller.app_version.as_str());
     if form.captcha == captcha_text {
-        ctx.insert("message", &jamp_message);
+        ctx.insert("message", &jump_message);
         Ok(Redirect::to("/login/test"))
     } else {
-        jamp_message.staus = false;
-        jamp_message.message = "验证码错误".to_string();
-        jamp_message.url = "/login/login".to_string();
-        ctx.insert("jamp_message", &jamp_message);
+        
         ctx.insert("username", form.username.as_str());
         ctx.insert("password", "");
         let captcha_image = generate_captcha_image(session).await;
         ctx.insert("captcha_image", &captcha_image);
-        ctx.insert("error", "验证码错误");
         if let Some(trans) = get_translation("en-US") {
             ctx.insert("trans", trans);
+            jump_message.staus = false;
+            jump_message.message = trans["login"]["form"]["captcha_error"].to_string();
+            jump_message.url = "/login/login".to_string();
         }
-        Err(Html(state.tera.render("common/message.html", &ctx).unwrap()))
+        ctx.insert("jump_message", &jump_message);
+        //Err(Html(state.tera.render("common/message.html", &ctx).unwrap()))
+        Err(super::webhotel_render(state.tera.clone(), ctx, "common/message.html"))
     }
 }
 
