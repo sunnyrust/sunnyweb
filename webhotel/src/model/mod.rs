@@ -1,4 +1,4 @@
-pub mod user;
+pub mod users;
 use crate::{dbstate::DbState,AppState,err::AppError,Result};
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -13,6 +13,7 @@ fn get_db_conn<'a>(state: &'a AppState) -> &'a sqlx::PgPool {
 fn get_redis_conn<'a>(state: &'a AppState) -> &'a redis::Client {
     &state.db_state.redis_conn
 }
+
 
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, sqlx::FromRow)]

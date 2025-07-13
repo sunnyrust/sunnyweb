@@ -31,8 +31,11 @@
     user = "User"
     user_title = "User Management Page"
     is_active = "Is Active"
+    
 [editor.list]
     userList = "User List"
+[editor.form]
+    username_empty_error = "Username cannot be empty"
 [login]
     login_title = "Login"
     title = "Login Page"

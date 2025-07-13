@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use sunny_derive_trait::*;
 use sunny_derive::*;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, sqlx::FromRow,PgCurdStruct)]
-#[TableName = "lychee_rbac.user"]
+#[TableName = "lychee_rbac.users"]
 #[CacheName = "all_user"]
 pub struct Model {
     pub id: i32,
@@ -34,9 +34,37 @@ impl Default for Model {
     }
 }
 
-#[allow(dead_code)]
-pub async fn insert_one<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<String> {
+
+/// 判断名字是不是在数据库中存在
+async fn have_name<'a,'b,'c>(state: &'a AppState,table_name:&'b String,name:&'c String) ->Result<bool>{
     let pool = get_db_conn(&state);
+    let sql=format!("SELECT count(1) as count from {} where name ='{}'",table_name,name);
+    let mut b=false;  
+    let parent_rows = sqlx::query_as::<_, super::CountModel>(&sql)
+        .fetch_one(pool)
+        .await;
+     match parent_rows {
+             Ok(result) => {
+                 if result.count!=0{
+                     b=true;
+                 }
+             },
+             Err(err) => {
+                 tracing::error!("----{}---",err);
+             }
+     }
+     Ok(b)
+ }
+
+#[allow(dead_code)]
+pub async fn insert_one<'a,'b,'c,'d>(state: &'a AppState,sql:&'b String,table_name:&'c String,name:&'d  String) -> Result<String> {
+    
+    let pool = get_db_conn(&state);
+    let b=have_name(state,table_name,name).await.unwrap();
+    if b{
+        let code = AppError::from_err(format!("name:{}:The nickname already exists.",name).into(),crate::AppErrorType::Database);
+        return Err(code);
+    }
     let res=sqlx::query(&sql)
     .execute(pool)
     .await;
@@ -53,10 +81,9 @@ pub async fn insert_one<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<Str
             return Err(code);
         }
     }
-    // clear redis cache
-    let client=get_redis_conn(&state);
-    let mut redis_conn = client.get_connection().expect("redis connect error");
-    let _ = redis::cmd("DEL").arg(get_cache_name()).exec(&mut redis_conn);
+    // remove redis cache
+    // operation redis:flush cache
+    remove_redis_cache(&state);
     Ok("ok".to_string())
 }
 
@@ -105,9 +132,15 @@ pub async fn get_one_by_id<'a,'b>(state: &'a AppState,sql:&'b String) -> std::re
 }
 
 
+/// 取得cache名字
 fn get_cache_name()->String{
-    let g=Model::default();
-    g.get_cache_name().to_string()
+    let model=Model::default();
+    model.get_cache_name().to_string()
 }
-
-
+/// 删除redis缓存中的数据
+fn remove_redis_cache(state: &AppState){
+    // 操作redis 清除缓存
+    let client=get_redis_conn(&state);
+    let mut redis_conn = client.get_connection().expect("redis connect error");
+    let _ = redis::cmd("DEL").arg(get_cache_name()).exec(&mut redis_conn);
+}

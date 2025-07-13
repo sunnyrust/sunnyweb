@@ -32,6 +32,8 @@
     is_active = "是否启用"
 [editor.list]
     userList = "用户列表"
+[editor.form]
+    username_empty_error = "用户名不能为空"
 [login]
     login_title = "登录"
     title = "登录页面"
