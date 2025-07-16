@@ -60,7 +60,7 @@ pub fn new_menu(){
             if cfg.app.edition.contains(&edition) {
                 tracing::info!("Edition {} is supported", edition);
             } else {
-                tracing::error!("Edition {} is not supported", edition);
+                tracing::error!("Edition {} is not supported❌", edition);
                 std::process::exit(0);
             }
             let millis = time::Duration::from_millis(300);
@@ -107,7 +107,7 @@ pub fn new_menu(){
             if check_file_exists("./resource/main.rs.template"){ 
                 match create_file_from_template(dir_name.clone(),"./resource/main.rs.template".to_string(),params_vec){
                     Ok(_)=>println!("Create  main.rs successfully.👌"),
-                    Err(e)=>println!("{}",e)
+                    Err(e)=>println!("{}❌",e)
                 }
             }else{
                 let app = get_main_default().unwrap();
@@ -184,7 +184,7 @@ pub fn new_menu(){
                 match copy_file(&dir_name,project_name.to_string()+"/src/lib.rs"){
                     Ok(_) => println!("Create  lib.rs  successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying file: {}", e);
+                        eprintln!("Error copying file: {}❌", e);
                         std::process::exit(0);
                     },
                 }
@@ -200,7 +200,7 @@ pub fn new_menu(){
                 match copy_file(&dir_name,project_name.to_string()+"/src/err.rs"){
                     Ok(_) => println!("Create  err.rs  successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying file: {}", e);
+                        eprintln!("Error copying file: {}❌", e);
                         std::process::exit(0);
                     },
                 }
@@ -216,7 +216,7 @@ pub fn new_menu(){
                 match copy_file(&dir_name,project_name.to_string()+"/src/router.rs"){
                     Ok(_) => println!("Create  router.rs  successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying file: {}", e);
+                        eprintln!("Error copying file: {}❌", e);
                         std::process::exit(0);
                     },
                 }
@@ -241,7 +241,7 @@ pub fn new_menu(){
                 match copy_dir(static_path, &target_static_path) {
                     Ok(_) => println!("Copy static files successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying static files: {}", e);
+                        eprintln!("Error copying static files: {}❌", e);
                         std::process::exit(0);
                     },
                 }
@@ -256,7 +256,7 @@ pub fn new_menu(){
                 match copy_dir(templates_path, &target_templates_path) {
                     Ok(_) => println!("Copy templates files successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying templates files: {}", e);
+                        eprintln!("Error copying templates files: {}❌", e);
                         std::process::exit(0);
                     },
                 }
@@ -271,12 +271,12 @@ pub fn new_menu(){
                 match copy_dir(locales_path, &target_locales_path) {
                     Ok(_) => println!("Copy locales files successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying locales files: {}", e);
+                        eprintln!("Error copying locales files: {}❌", e);
                         std::process::exit(0);
                     },
                 }
             } else {
-                println!("Locales directory does not exist at {}", locales_path);
+                println!("Locales directory does not exist at {}❌", locales_path);
             }
             //copy src to src
             let src_path="./resource/src";
@@ -285,7 +285,7 @@ pub fn new_menu(){
                 match copy_dir(src_path, &target_src_path) {
                     Ok(_) => println!("Copy src files successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying src files: {}", e);
+                        eprintln!("Error copying src files: {}❌", e);
                         std::process::exit(0);
                     },
                 }
@@ -299,12 +299,12 @@ pub fn new_menu(){
                 match copy_dir(src_path, &target_src_path) {
                     Ok(_) => println!("Copy sunny-derive-trait files successfully.👌"),
                     Err(e) => {
-                        eprintln!("Error copying sunny-derive-trait files: {}", e);
+                        eprintln!("Error copying sunny-derive-trait files: {}❌", e);
                         std::process::exit(0);
                     },
                 }
             } else {
-                println!("sunny-derive-trait directory does not exist at {}", src_path);
+                println!("sunny-derive-trait directory does not exist at {}❌", src_path);
             }
             // create Dockerfile
             dir_name=project_name.to_string()+"/Dockerfile";
@@ -330,12 +330,12 @@ pub fn new_menu(){
             println!("Manage databases for web app {}, database: {}", name, database);
             let path=name.to_string();
             if !dir_exists(&path) {
-                tracing::error!("Directory is not exists: {}.You must create it first.Example: \n\tlycheecli new --name={} --authors=[\"jinheking@163.com\"] --edition=2021", path,path);
+                tracing::error!("Directory is not exists: {}❌.You must create it first.Example: \n\tlycheecli new --name={} --authors=[\"jinheking@163.com\"] --edition=2021", path,path);
                 std::process::exit(1);
             } 
             let db_path = format!("./{}/{}", path, database);
             if check_file_exists(&db_path) {
-                println!("Database {} already exists.\nIf you want to initialize it, you could drop it first.", database);
+                println!("Database {} already exists.❌\nIf you want to initialize it, you could drop it first.", database);
                 std::process::exit(0);
             }
             let millis = time::Duration::from_millis(300);
@@ -355,7 +355,7 @@ pub fn new_menu(){
             let cargo_toml_path: String = format!("{}/Cargo.toml", path);
             if check_file_exists(&cargo_toml_path) {
                 let mut content: String = std::fs::read_to_string(&cargo_toml_path)
-                    .expect("Failed to read Cargo.toml");
+                    .expect("Failed to read Cargo.toml❌");
                 
                 append_content(&cargo_toml_path,&mut content, "sqlx", "\nsqlx = { version = \"0.8.6\", features = [\"sqlite\", \"runtime-tokio-rustls\"] }");
                 append_content(&cargo_toml_path,&mut content, "tokio", "\ntokio = { version = \"1.0\", features = [\"full\"] }");
@@ -363,7 +363,7 @@ pub fn new_menu(){
                 append_content(&cargo_toml_path,&mut content, "rust-argon2", "\nrust-argon2  = \"2.1.0\"");
 
             } else {
-                println!("Cargo.toml does not exist at {}", cargo_toml_path);
+                println!("Cargo.toml does not exist at {}❌", cargo_toml_path);
             }
 
         }

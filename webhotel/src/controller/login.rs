@@ -9,7 +9,8 @@ use axum::{
     http::{StatusCode, header},
 };
 use captcha_rs::CaptchaBuilder;
-use crate::{AppState,controller::get_app_state,utils::*,BaseController,get_translation};
+use sunny_derive_trait::PgCurdStruct;
+use crate::{AppState,controller::get_app_state,utils::*,BaseController,get_translation,model::users,utils::password::PasswordHasher};
 use std::sync::Arc;
 use tera::{ Context};
 use tower_sessions::{Session};
@@ -56,6 +57,25 @@ pub async fn login(
     // 模拟验证逻辑
     let mut ctx = Context::new();
     ctx.insert("getversion", base_controller.app_version.as_str());
+    // 验证用户名密码
+    // 获取用户信息
+    let mut user_model  = users::Model::default();
+    // user_model.username = form.username.clone();
+    let password_hash = PasswordHasher::new().hash(form.password.clone().as_str());
+    // user_model.password_hash = form.password.clone();
+    // get_one_by_username_and_password
+    let strsql= user_model.get_one_by_username_and_password(&form.username, &password_hash);
+    tracing::info!("❌SQL Query: {}❌", strsql);
+    let user = users::get_one(&state, &strsql).await;
+    if user.is_ok() {
+        // 获取用户信息成功
+        let user = user.unwrap();
+        // 验证密码
+        let password_hash = password::PasswordHasher::new();
+    }else{
+        tracing::error!("❌验证失败❌");
+    }
+    // 验证码验证
     if form.captcha == captcha_text {
         ctx.insert("message", &jump_message);
         Ok(Redirect::to("/index"))

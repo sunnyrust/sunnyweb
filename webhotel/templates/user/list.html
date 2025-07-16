@@ -140,7 +140,17 @@
                 </td>
                 <td>{{elem.email}}</td>
                 <td>{{elem.is_active}}</td>
-                <td>Operation</td>
+                <td>
+                    {% if check_power(controller="editor", action="edit", id=1) %}
+                        <a href="/editor/edit/id/{{ elem.id }}" class="rows_hover">📃</a>
+                    {% endif %}
+                    {% if elem.id != 1 %}
+                        {% if check_power(controller="editor", action="del", id=1) %}
+                            <span class="td_hr">|</span>
+                            <a href="/editor/del/id/{{ elem.id }}" class="rows_hover">❌️</a>
+                        {% endif %}
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
             </tbody>

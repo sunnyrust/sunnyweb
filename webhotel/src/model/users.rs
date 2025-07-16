@@ -122,7 +122,7 @@ pub async fn get_all<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<Vec<Mo
 }
 #[allow(dead_code)]
 /// get one data by id
-pub async fn get_one_by_id<'a,'b>(state: &'a AppState,sql:&'b String) -> std::result::Result<Model,String>  {
+pub async fn get_one<'a,'b>(state: &'a AppState,sql:&'b String) -> std::result::Result<Model,String>  {
     let pool = get_db_conn(&state);
     let result = sqlx::query_as::<_, Model>(&sql)
                     .fetch_one(pool)

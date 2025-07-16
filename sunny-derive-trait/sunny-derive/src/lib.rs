@@ -127,6 +127,9 @@ pub fn derive_signature(item: TokenStream) -> TokenStream {
             fn get_one_by_id(&self,id: i32) -> String {
                 format!("SELECT * from {} where id ={}", #table_name, id)
             }
+            fn get_one_by_username_and_password(&self,username: &str,password: &str) -> String {
+                format!("SELECT * from {} where username ='{}' and password_hash='{}'", #table_name, username, password)
+            }
 
             // fn get_one_by_id<'a,'b>(&self,state: &'a DbState,id:i32) -> Result<Model> {
             //     #[allow(unused_assignments)]
