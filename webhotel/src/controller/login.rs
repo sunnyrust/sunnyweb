@@ -58,7 +58,7 @@ pub async fn login(
     ctx.insert("getversion", base_controller.app_version.as_str());
     if form.captcha == captcha_text {
         ctx.insert("message", &jump_message);
-        Ok(Redirect::to("/login/test"))
+        Ok(Redirect::to("/index"))
     } else {
         
         ctx.insert("username", form.username.as_str());

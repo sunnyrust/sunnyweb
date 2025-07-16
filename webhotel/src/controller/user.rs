@@ -1,5 +1,5 @@
 use crate::model::users::*;
-use crate::{AppError, AppState, Result,model::users};
+use crate::{AppError, AppState, Result,model::users,utils::password::PasswordHasher};
 
 /// index controller
 use axum::{
@@ -11,7 +11,6 @@ use axum::{
     extract::{Form,Query, State},
     http::{StatusCode, header},
 };
-use captcha_rs::CaptchaBuilder;
 use sunny_derive_trait::PgCurdStruct;
 use crate::{controller::get_app_state,utils::*,BaseController,get_translation};
 use std::sync::Arc;
@@ -34,10 +33,7 @@ async fn add(
     ) -> Html<String> {
     tracing::info!("User……😀");
     let mut ctx = Context::new();
-    // ctx.insert("username", "user");
-    // ctx.insert("password", "pass");
-    // let captcha_image = generate_captcha_image(session).await;
-    // ctx.insert("captcha_image", &captcha_image);
+
     if let Some(trans) = get_translation("zh-CN") {
         ctx.insert("trans", trans);
     }
@@ -77,6 +73,7 @@ pub struct UserAddForm {
     pub id: Option<i32>,
     pub name: String,
     pub password: String,
+    pub re_password: String,
     pub email: String,
     pub username: String,
     pub description: String,
@@ -104,6 +101,13 @@ async fn do_insert(
     tracing::info!("is_active:{}", is_active);
     ctx.insert("getversion", base_controller.app_version.as_str());
     let state = get_app_state(&state);
+    if user.password!=user.re_password {
+        jump_message.staus = false;
+        jump_message.message = trans["editor"]["passwordMatch"].to_string();
+        jump_message.url = "/user/add".to_string();
+        ctx.insert("jump_message", &jump_message);
+        return Err(super::webhotel_render(state.tera.clone(), ctx, "common/message.html"));
+    }
     if user.name.is_empty() {
         jump_message.staus = false;
         jump_message.message = trans["editor"]["form"]["username_empty_error"].to_string();
@@ -111,10 +115,11 @@ async fn do_insert(
         ctx.insert("jump_message", &jump_message);
         Err(super::webhotel_render(state.tera.clone(), ctx, "common/message.html"))
     }else{
+        let password_hash = PasswordHasher::new().hash(user.password.as_str());
         let user_model  = users::Model{
             id: user.id.unwrap_or(0),
             name: user.name,
-            password_hash: user.password, // In a real application, you should hash the password
+            password_hash: password_hash,
             email: user.email,
             username: user.username.clone(),
             description: user.description,
@@ -164,17 +169,11 @@ async fn list(
     }
     ctx.insert("action_name", "List");
     ctx.insert("getversion", base_controller.app_version.as_str());
-    let mut tpl = crate::model::users::Model::default();
-    tpl.id = 1; // Example ID, replace with actual logic to fetch user data
-    tpl.name = "Example User".to_string(); // Example name, replace with actual logic
-    tpl.email = "example@example.com".to_string(); // Example email, replace with actual logic
-    tpl.username = "exampleuser".to_string(); // Example username, replace with actual logic
-    tpl.description = "This is an example user description.".to_string(); // Example description
-    tpl.is_active = true;
-    let mut user_list = Vec::new();
-    user_list.push(tpl.clone());
+    
+    let model  = users::Model::default();
+    let user_list = crate::model::users::get_all(&state, &model.select()).await.unwrap_or_else(|_| vec![]);
     ctx.insert("user_list", &user_list);
-    ctx.insert("user", &tpl);
+    ctx.insert("user", &model);
 
     let state = get_app_state(&state);
     let rendered = state.tera.render("user/list.html", &ctx).unwrap();

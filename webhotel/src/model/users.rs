@@ -104,21 +104,21 @@ pub async fn get_all<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<Vec<Mo
         }
     };
     #[allow(unused_assignments)]
-    let mut vec_emotion:Vec<Model>=vec![];
+    let mut vec_model:Vec<Model>=vec![];
     if !b_have_key{
         let pool = get_db_conn(&state);
         let rows = sqlx::query_as::<_, Model>(&sql)
             .fetch_all(pool)
             .await
             .unwrap();
-        vec_emotion=rows.clone();
+        vec_model=rows.clone();
         // insert redis cache
         let strm:String=serde_json::to_string(&rows).unwrap();
         let _:()=redis_conn.set(get_cache_name(),  strm).unwrap();
     }else{
-        vec_emotion=serde_json::from_str(&result).unwrap();
+        vec_model=serde_json::from_str(&result).unwrap();
     }
-    Ok(vec_emotion)
+    Ok(vec_model)
 }
 #[allow(dead_code)]
 /// get one data by id
