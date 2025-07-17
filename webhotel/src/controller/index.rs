@@ -21,6 +21,8 @@ pub fn router() -> Router {
 }
 #[derive(Deserialize,Serialize,Debug, Clone)]
 pub struct  Usr{
+    pub username: String,
+    pub user_id: i32,
     pub some_url: String,
     pub some_target: String,
     pub has_power: bool,
@@ -28,6 +30,8 @@ pub struct  Usr{
 impl Default for Usr {
     fn default() -> Self {
         Usr {
+            username: "Guest".to_string(),
+            user_id: -1,
             some_url: "https://www.baidu.com".to_string(),
             some_target: "百度".to_string(),
             has_power: true,
@@ -41,15 +45,16 @@ async fn render(
     ) -> Html<String> {
     tracing::info!("Index……😀");
     let mut ctx = Context::new();
-    // ctx.insert("username", "user");
-    // ctx.insert("password", "pass");
-    // let captcha_image = generate_captcha_image(session).await;
-    // ctx.insert("captcha_image", &captcha_image);
-    if let Some(trans) = get_translation("zh-CN") {
+    if let Some(trans) = get_translation("en-US") {
         ctx.insert("trans", trans);
     }
-    let usr = Usr::default();
+    let mut usr = Usr::default();
+    let u_name = session.get::<String>("username").await.unwrap_or(Some("Guest".to_string()));
+    usr.username = u_name.unwrap();
+    let u_id= session.get::<i32>("id").await.unwrap_or(Some(-1));
+    usr.user_id = u_id.unwrap();
     ctx.insert("usr", &usr);
+    
     let state = get_app_state(&state);
     let rendered = state.tera.render("index/index.html", &ctx).unwrap();
     Html(rendered)

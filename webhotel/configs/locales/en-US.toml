@@ -12,6 +12,14 @@
     password = "Password"
     operation = "Operation"
     confirm_deletion = "Confirm deletion of this item"
+[theme]
+    sky= "Sky"
+    green= "Green"
+    blue = "Blue"
+    white = "White"
+    orange = "Orange"
+    chinese = "Chinese"
+    english = "English"
 [editor]
     email = "Email"
     checkEmail = "Please enter the correct email format"
@@ -46,6 +54,7 @@
     password_label = "Input password"
     submit_label = "Login"
     captcha_error = "Incorrect verification code"
+    login_error = "Incorrect user name or password"
 [message]
     congratulations = "Congratulation"
     pageAutomatically = "Auto page"

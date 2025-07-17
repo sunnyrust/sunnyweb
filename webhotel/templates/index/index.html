@@ -91,7 +91,9 @@
         .theme-selector {
              margin-left: auto; /* 将主题选择器推到右侧 */
         }
-        
+        .user-display{
+            margin-left: auto;
+        }
         .theme-selector select {
             padding: 8px 12px;
             border-radius: 4px;
@@ -180,13 +182,21 @@
     <!-- Banner 部分 -->
     <div class="banner">
         <h1>CMS568</h1>
+       
         <div class="theme-selector">
+            <div id="user-display" style="margin:15px 20px 0 0; color:blue; font-size:20px; font-weight:bold;">
+                {{ usr.username }}
+            </div>
             <select id="themeSelect" onchange="changeTheme()">
-                <option value="sky-theme">天空主题</option>
-                <option value="green-theme">绿色主题</option>
-                <option value="blue-theme">蓝色主题</option>
-                <option value="white-theme">白色主题</option>
-                <option value="orange-theme">橙色主题</option>
+                <option value="sky-theme">{{ trans["theme"]["sky"] }}</option>
+                <option value="green-theme">{{ trans["theme"]["green"] }}</option>
+                <option value="blue-theme">{{ trans["theme"]["blue"] }}</option>
+                <option value="white-theme">{{ trans["theme"]["white"] }}</option>
+                <option value="orange-theme">{{ trans["theme"]["orange"] }}</option>
+            </select>
+            <select id="langSelect" onchange="changeTheme()">
+                <option value="chinese-lang">{{ trans["theme"]["chinese"] }}</option>
+                <option value="english-lang">{{ trans["theme"]["english"] }}</option>
             </select>
         </div>
     </div>

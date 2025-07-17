@@ -70,17 +70,29 @@ pub async fn login(
     if user.is_ok() {
         // 获取用户信息成功
         let user = user.unwrap();
-        // 验证密码
-        let password_hash = password::PasswordHasher::new();
+        session.insert("username", user.username).await.unwrap();
+        session.insert("id", user.id).await.unwrap();
     }else{
         tracing::error!("❌验证失败❌");
+        ctx.insert("username", form.username.as_str());
+        ctx.insert("password", "");
+        let captcha_image = generate_captcha_image(session).await;
+        ctx.insert("captcha_image", &captcha_image);
+        if let Some(trans) = get_translation("en-US") {
+            ctx.insert("trans", trans);
+            jump_message.staus = false;
+            jump_message.message = trans["login"]["form"]["login_error"].to_string();
+            jump_message.url = "/login/login".to_string();
+        }
+        ctx.insert("jump_message", &jump_message);
+        //Err(Html(state.tera.render("common/message.html", &ctx).unwrap()))
+        return Err(super::webhotel_render(state.tera.clone(), ctx, "common/message.html"));
     }
     // 验证码验证
     if form.captcha == captcha_text {
         ctx.insert("message", &jump_message);
         Ok(Redirect::to("/index"))
     } else {
-        
         ctx.insert("username", form.username.as_str());
         ctx.insert("password", "");
         let captcha_image = generate_captcha_image(session).await;
