@@ -20,6 +20,7 @@ pub fn router() -> Router {
         .route("/login", get(render_login))
         .route("/login", post(login))
         .route("/captcha", get(generate_captcha_image))
+        .route("/lang", post(change_language))
         .route("/test", get(test))
 }
 
@@ -177,4 +178,18 @@ async fn test(
     
     let rendered = state.tera.render("auth/test.html", &ctx).unwrap();
     Html(rendered)
+}
+#[derive(Debug, Deserialize)]
+pub struct LanguageParams {
+    pub language: String,
+}
+// 处理语言切换
+// 返回状态200
+async fn change_language(
+    session: Session,
+    axum::Json(params): axum::Json<LanguageParams>,
+) -> impl IntoResponse {
+    tracing::info!("Changing language to: {}✔️✔️✔️✅✅✅", params.language);
+    session.insert("lang", params.language).await.unwrap();
+    StatusCode::OK
 }
