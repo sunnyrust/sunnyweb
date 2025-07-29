@@ -135,15 +135,21 @@ async fn render_login(
     session: Session
     ) -> Html<String> {
     let info=get_web_info(&info);
-    tracing::info!("Login……😀---{:?}",&info.supported);
+    tracing::info!("Login……😀---{:?}",info.default.clone());
     let mut ctx = Context::new();
     ctx.insert("username", "user");
     ctx.insert("password", "pass");
-    ctx.insert("current_language", &info.default);
+    let lang=session.get::<String>("language").await.unwrap().unwrap();
+    tracing::info!("Login……😀---{:?}",lang);
+    if lang.is_empty() {
+        ctx.insert("current_language", &info.default);
+    } else {
+        ctx.insert("current_language", &lang);
+    }
     ctx.insert("supported_languages", &info.supported);
     let captcha_image = generate_captcha_image(session).await;
     ctx.insert("captcha_image", &captcha_image);
-    if let Some(trans) = get_translation("zh-CN") {
+    if let Some(trans) = get_translation(&lang) {
         ctx.insert("trans", trans);
     }
 
@@ -194,6 +200,7 @@ async fn change_language(
     axum::Json(params): axum::Json<LanguageParams>,
 ) -> impl IntoResponse {
     tracing::info!("Changing language to: {}✔️✔️✔️✅✅✅", params.language);
-    session.insert("lang", params.language).await.unwrap();
+    session.insert("language", params.language).await.unwrap();
+    // session.insert("language", "zh-CN".to_string()).await.unwrap();
     StatusCode::OK
 }

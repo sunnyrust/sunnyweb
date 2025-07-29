@@ -21,6 +21,16 @@ use tower_sessions_redis_store::{fred::prelude::*,RedisStore}; // In production,
 use std::sync::{Arc,Mutex};
 use sqlx::postgres::PgPoolOptions;
 // use tokio::sync::Mutex;
+
+async fn clear_all_sessions(pool: &Pool) -> Result<(), Box<dyn std::error::Error>> {
+    let keys: Vec<String> = pool.hkeys("*webhotel_session*").await?;
+
+    if !keys.is_empty() {
+        let _: usize = pool.del(keys).await?;
+    }
+
+    Ok(())
+}
 #[tokio::main]
 async fn main() {
     let cfg=webhotel::new("webhotel");
@@ -103,6 +113,9 @@ async fn main() {
     let pool = Pool::new(tower_sessions_redis_store::fred::prelude::Config::from_url(&redis_url).unwrap(), None, None, None, 6).unwrap();
     let redis_conn = pool.connect();
     pool.wait_for_connect().await.unwrap();
+
+    // 清除所有 session (可选)
+clear_all_sessions(&pool).await.expect("Failed to clear sessions");
     // 2. 创建 Redis 存储
     let redis_store = RedisStore::new(pool);
 

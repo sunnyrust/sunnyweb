@@ -321,6 +321,7 @@ function changeLanguage(lang) {
     })
     .then(response => {
         if(response.ok) {
+            localStorage.setItem('selected_language', lang);
             window.location.reload(); // 重新加载页面以应用新语言
         }
     })
@@ -331,9 +332,13 @@ function changeLanguage(lang) {
 }
 // 初始化语言选择器，根据当前语言设置选中项
 document.addEventListener('DOMContentLoaded', function() {
-    // 这里应该从cookie或localStorage中获取当前语言设置
-    const currentLang = document.documentElement.lang || 'zh-CN';
-    document.getElementById('language-select').value = currentLang;
+    const storedLang = localStorage.getItem('selected_language');
+    const currentLang = storedLang || document.documentElement.lang || 'zh-CN';
+    const selectElement = document.getElementById('language-select');
+    
+    if (selectElement) {
+        selectElement.value = currentLang;
+    }
 });
 </script>
 </html>

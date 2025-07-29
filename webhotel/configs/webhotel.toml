@@ -14,5 +14,5 @@
 [langconf]
 #此处有一个绝绝子的错误，执行shell： env | grep LANGUAGE
 #env | grep LANG 获取语言环境变量 所以配置名字不能是lang或者language
-    default="en-US"
+    default="zh-CN"
     supported=["zh-CN","en-US"]
