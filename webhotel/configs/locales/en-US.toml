@@ -55,6 +55,8 @@
     submit_label = "Login"
     captcha_error = "Incorrect verification code"
     login_error = "Incorrect user name or password"
+    remember_password = "Remember password"
+    forgot_password = "Forgot password"
 [message]
     congratulations = "Congratulation"
     pageAutomatically = "Auto page"
