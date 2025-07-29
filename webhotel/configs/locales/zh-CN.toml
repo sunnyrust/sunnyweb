@@ -18,8 +18,8 @@
     blue = "蓝色主题"
     white= "白色主题"
     orange= "橙色主题"
-    chinese = "中文"
-    english = "英文"
+    zh-CN = "中文"
+    en-US = "英文"
 [editor]
     email = "邮箱"
     checkEmail = "请输入正确格式的邮箱"

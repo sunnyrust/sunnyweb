@@ -1,7 +1,7 @@
 pub mod login;
 pub mod index;
 pub mod user;
-use crate::{AppState,AppError,Result};
+use crate::{AppState,AppError,Result,config::WebHotelInfo};
 
 use askama::Template;
 use axum::{
@@ -11,6 +11,12 @@ use axum::{
 /// get app state
 pub fn get_app_state<'a>(state: &'a AppState) -> &'a AppState {
     state
+}
+
+
+#[allow(dead_code)]
+fn get_web_info<'a>(webinfo: &'a WebHotelInfo) -> WebHotelInfo{
+   webinfo.to_owned()
 }
 #[allow(dead_code)]
 /// 渲染模板

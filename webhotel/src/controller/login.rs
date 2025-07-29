@@ -10,7 +10,7 @@ use axum::{
 };
 use captcha_rs::CaptchaBuilder;
 use sunny_derive_trait::PgCurdStruct;
-use crate::{AppState,controller::get_app_state,utils::*,BaseController,get_translation,model::users,utils::password::PasswordHasher};
+use crate::{controller::{get_app_state, get_web_info}, get_translation, model::users, utils::{password::PasswordHasher, *}, AppState, BaseController,config::WebHotelInfo};
 use std::sync::Arc;
 use tera::{ Context};
 use tower_sessions::{Session};
@@ -131,12 +131,16 @@ async fn generate_captcha_image(
 }
 async fn render_login(
     Extension(state): Extension<Arc<AppState>>,
+    Extension(info): Extension<Arc<WebHotelInfo>>,
     session: Session
     ) -> Html<String> {
-    tracing::info!("Login……😀");
+    let info=get_web_info(&info);
+    tracing::info!("Login……😀---{:?}",&info.supported);
     let mut ctx = Context::new();
     ctx.insert("username", "user");
     ctx.insert("password", "pass");
+    ctx.insert("current_language", &info.default);
+    ctx.insert("supported_languages", &info.supported);
     let captcha_image = generate_captcha_image(session).await;
     ctx.insert("captcha_image", &captcha_image);
     if let Some(trans) = get_translation("zh-CN") {

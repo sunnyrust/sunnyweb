@@ -19,10 +19,16 @@ pub struct DbConfig {
     pub connections:u32,
 }
 #[derive(Deserialize)]
+pub struct LanguageConfig {
+    pub default: String,
+    pub supported: Vec<String>,
+}
+#[derive(Deserialize)]
 pub struct Config {
     pub web: WebConfig,
     pub db: DbConfig,
     pub redis: RedisConfig,
+    pub langconf: LanguageConfig,
 }
 impl Config {
     pub fn from_env() -> Result<Self, config::ConfigError> {
@@ -49,4 +55,6 @@ impl Config {
 pub struct WebHotelInfo{
     pub web_addr:String,
     pub web_version:String,
+    pub default: String,
+    pub supported: Vec<String>,
 }

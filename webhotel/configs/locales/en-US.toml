@@ -18,8 +18,8 @@
     blue = "Blue"
     white = "White"
     orange = "Orange"
-    chinese = "Chinese"
-    english = "English"
+    zh-CN = "Chinese"
+    en-US = "English"
 [editor]
     email = "Email"
     checkEmail = "Please enter the correct email format"

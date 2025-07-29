@@ -27,9 +27,11 @@ async fn main() {
     // println!("I'm lying flat.\t I'm locking down.");
     tracing::info!("I'm lying flat.\t I'm locking down in webhotel.");
     // tracing::debug!("{}---{}",&cfg.web.addr.clone(),&cfg.web.version.clone());
-    let web_info=config::WebHotelInfo{
+    let web_info: config::WebHotelInfo=config::WebHotelInfo{
         web_addr:cfg.web.addr.clone(),
         web_version:cfg.web.version.clone(),
+        default: cfg.langconf.default.clone(),
+        supported: cfg.langconf.supported.clone(),
     };
     
     let run_mode=cfg.web.runmode.clone();
