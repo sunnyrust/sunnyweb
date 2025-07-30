@@ -3,7 +3,7 @@
 |No.| Version | Description |Date |
 |---|---|---|---|
 |1| v0.1.0 | Initial release |2024/11/20|
-
+|2| v0.2.0 | Initial release |2025/07/30|
 ## Table of contents
 * [TODO](#todo)
 * [Introduction](#introduction)
@@ -33,6 +33,9 @@
 - [x] Create CAPTCHA.
 - [x] Use redis to store session
 - [x] Check user login
+- [x] Use i18n in template
+- [x] Use i18n in controller
+- [x] Save session 
 - [ ] Create view.rs
 ## Introduction
 This is my personal web server program.I had to make it public so that I can share it with others.
