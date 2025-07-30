@@ -1,0 +1,3 @@
+#tb-1 .tab_rows1 th:first-child{width:60px;}
+#tb-1 .tab_rows1 th:last-child{width:90px;}
+.collect-icon{cursor:pointer;font-size:18px;}

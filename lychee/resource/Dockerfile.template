@@ -1,0 +1,25 @@
+From ubuntu:24.04
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    libboost-all-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/*
+# Set the working directory
+WORKDIR /opt/website
+# Copy the source code
+COPY . /opt/website/
+RUN rm -rf /opt/website/Dockerfile
+
+# Build the project
+
+# Expose the port
+EXPOSE 9807
+# Set the entrypoint
+# ENTRYPOINT ["/opt/website/build/lychee"]

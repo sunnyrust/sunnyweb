@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebHotel HomePage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        
+        /* 默认天空主题 */
+        body.sky-theme {
+            --banner-color: #7dbcea;
+            --menu-color: #3ba0e9;
+            --content-bg: #108ee9;
+            --hover-color: #4CAF50;
+            --text-color: white;
+            --menu-text-color: white;
+        }
+        /* 默认绿色主题 */
+        body.green-theme {
+            --banner-color: #4CAF50;
+            --menu-color: #333;
+            --content-bg: #f9f9f9;
+            --hover-color: #4CAF50;
+            --text-color: #333;
+            --menu-text-color: white;
+        }
+        
+        /* 蓝色主题 */
+        body.blue-theme {
+            --banner-color: #2196F3;
+            --menu-color: #1565C0;
+            --content-bg: #E3F2FD;
+            --hover-color: #2196F3;
+            --text-color: #0D47A1;
+            --menu-text-color: white;
+        }
+        
+        /* 白色主题 */
+        body.white-theme {
+            --banner-color: #f5f5f5;
+            --menu-color: #e0e0e0;
+            --content-bg: #ffffff;
+            --hover-color: #bdbdbd;
+            --text-color: #212121;
+            --menu-text-color: black;
+        }
+        
+        /* 新增橙色主题 */
+        body.orange-theme {
+            --banner-color: #FF9800;
+            --menu-color: #E65100;
+            --content-bg: #FFF3E0;
+            --hover-color: #FF9800;
+            --text-color: #BF360C;
+            --menu-text-color: white;
+        }
+        
+        /* Banner 样式 */
+        .banner {
+            background-color: var(--banner-color);
+            color: var(--text-color);
+            padding: 20px;
+            text-align: center;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .banner h1 {
+            font-size: 2em;
+            position: absolute; /* 绝对定位 */
+            left: 50%; /* 水平居中 */
+            transform: translateX(-50%); /* 精确居中 */
+            margin: 0; /* 移除原有margin */
+        }
+        
+        .theme-selector {
+             margin-left: auto; /* 将主题选择器推到右侧 */
+        }
+        .user-display{
+            margin-left: auto;
+        }
+        .theme-selector select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        /* 主要内容容器 */
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        
+        /* Menu 样式 */
+        .menu {
+            width: 200px;
+            background-color: var(--menu-color);
+            color: var(--menu-text-color);
+            padding: 20px 0;
+        }
+        
+        .menu ul {
+            list-style-type: none;
+        }
+        
+        .menu li {
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+        
+        .menu li:hover {
+            background-color: var(--hover-color);
+            cursor: pointer;
+        }
+        
+        .menu a {
+            color: var(--menu-text-color);
+            text-decoration: none;
+            display: block;
+        }
+        
+        /* Content 样式 */
+        .content {
+            flex: 1;
+            padding: 10px; /* 修改为0，去除内边距 */
+            background-color: var(--content-bg);
+            color: var(--text-color);
+        }
+        
+        .content h2 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+        
+        .content p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+         /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,.1);
+            border-radius: 50%;
+            border-top-color: var(--text-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 添加iframe样式 */
+        .embedded-page {
+            width: 100%;
+            height: 100%;
+            border: none; /* 去除边框 */
+            min-height: calc(100vh - 100px); /* 减去banner高度 */
+        }
+    </style>
+</head>
+<body class="sky-theme">
+    <!-- Banner 部分 -->
+    <div class="banner">
+        <h1>CMS568</h1>
+       
+        <div class="theme-selector">
+            <div id="user-display" style="margin:15px 20px 0 0; color:blue; font-size:20px; font-weight:bold;">
+                {{ usr.username }}
+            </div>
+            <select id="themeSelect" onchange="changeTheme()">
+                <option value="sky-theme">{{ trans["theme"]["sky"] }}</option>
+                <option value="green-theme">{{ trans["theme"]["green"] }}</option>
+                <option value="blue-theme">{{ trans["theme"]["blue"] }}</option>
+                <option value="white-theme">{{ trans["theme"]["white"] }}</option>
+                <option value="orange-theme">{{ trans["theme"]["orange"] }}</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- 主要内容容器 -->
+    <div class="container">
+        <!-- Menu 部分 -->
+        <div class="menu">
+            <ul>
+                <li><a href="#"  data-page="user">用户</a></li>
+                <li><a href="/login/login" target="_blank" class="external-link">Login</a></li>
+                <li><a href="#" data-page="form" onclick="loadFormPage('/user/add')">用户添加</a></li>
+                <li><a href="#" data-page="form" onclick="loadFormPage('/user/list')">用户修改</a></li>
+                <li><a href="#" data-page="news">新闻动态</a></li>
+                <li><a href="#" data-page="contact">联系我们</a></li>
+            </ul>
+        </div>
+        
+        <!-- Content 部分 -->
+        <div  class="content" id="content-area">
+            <h2>欢迎来到我们的网站</h2>
+            <p>这里是内容区域，您可以在这里放置各种信息、文章、图片等内容。</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
+            <p>Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
+            <p>
+                {% set link = check_is_href(url=usr.some_url, target=usr.some_target, is_power=usr.has_power) %}
+                {{ link | safe }}
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 切换主题函数
+        function changeTheme() {
+            const themeSelect = document.getElementById('themeSelect');
+            const selectedTheme = themeSelect.value;
+            document.body.className = selectedTheme;
+        }
+
+        // 加载表单页面到iframe
+        function loadFormPage(url) {
+            event.preventDefault();
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `<iframe class="embedded-page" src="${url}"></iframe>`;
+        }
+        
+        // 模拟从后台获取不同页面内容
+        function fetchPageContent(page) {
+            // 这里模拟不同页面的返回数据
+            const pageContents = {
+                user: {
+                    title: "欢迎来到首页",
+                    content: "<p>这里是网站的首页内容，您可以查看最新的信息和动态。</p>"
+                },
+                about: {
+                    title: "关于我们",
+                    content: "<p>我们是一家专业的科技公司，致力于为客户提供最好的服务。</p><p>公司成立于2010年，拥有丰富的行业经验。</p>"
+                },
+                user_add: {
+                    title: "用户添加",
+                    content: "<p>在这里您可以添加新的用户信息。</p>"
+                },
+                news: {
+                    title: "新闻动态",
+                    content: "<p>最新公司动态：</p><ul><li>2023年新产品发布会</li><li>公司获得行业大奖</li></ul>"
+                },
+                contact: {
+                    title: "联系我们",
+                    content: "<p>您可以通过以下方式联系我们：</p><p>电话：123-456-7890</p><p>邮箱：contact@example.com</p>"
+                },
+                form: {
+                    title: "用户表单",
+                    content: '<iframe class="embedded-page" src="/user/add"></iframe>'
+                }
+            };
+            
+            // 模拟网络延迟
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(pageContents[page] || {
+                        title: "页面未找到",
+                        content: "<p>请求的页面不存在，请检查链接是否正确。</p>"
+                    });
+                }, 800);
+            });
+        }
+
+        // 初始化时设置正确的选项
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeSelect = document.getElementById('themeSelect');
+            themeSelect.value = 'sky-theme'; // 默认选中绿色主题
+            
+            // 获取所有菜单链接和内容区域
+            const menuLinks = document.querySelectorAll('.menu a:not(.external-link):not([onclick])');
+            const contentArea = document.getElementById('content-area');
+            
+            // 为所有非外部链接菜单项添加点击事件
+            menuLinks.forEach(link => {
+                link.addEventListener('click', async function(e) {
+                    e.preventDefault(); // 阻止默认链接行为
+                    
+                    const page = this.getAttribute('data-page');
+                    
+                    // 显示加载状态
+                    contentArea.innerHTML = '<div class="loading"></div> 正在加载内容...';
+                    
+                    try {
+                        // 获取页面内容
+                        const response = await fetchPageContent(page);
+                        
+                        // 更新内容区域
+                        contentArea.innerHTML = `
+                            ${page === 'form' ? '' : `<h2>${response.title}</h2>`}
+                            ${response.content}
+                        `;
+                    } catch (error) {
+                        contentArea.innerHTML = '<p>加载内容时出错，请稍后再试。</p>';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

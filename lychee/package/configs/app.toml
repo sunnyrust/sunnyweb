@@ -1,0 +1,5 @@
+[db]
+    pg="postgres://dba:123456@localhost:5432/auth"
+    connections=10
+[app]
+    edition=["2015","2018","2021","2024"]
