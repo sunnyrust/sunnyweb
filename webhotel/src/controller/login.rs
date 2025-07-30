@@ -60,13 +60,10 @@ pub async fn login(
     ctx.insert("getversion", base_controller.app_version.as_str());
     // 验证用户名密码
     // 获取用户信息
-    let mut user_model  = users::Model::default();
+    let user_model  = users::Model::default();
     // user_model.username = form.username.clone();
     let password_hash = PasswordHasher::new().hash(form.password.clone().as_str());
-    // user_model.password_hash = form.password.clone();
-    // get_one_by_username_and_password
     let strsql= user_model.get_one_by_username_and_password(&form.username, &password_hash);
-    tracing::info!("❌SQL Query: {}❌", strsql);
     let user = users::get_one(&state, &strsql).await;
     if user.is_ok() {
         // 获取用户信息成功
