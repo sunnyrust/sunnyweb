@@ -1,13 +1,18 @@
-[db]
-    pg="postgres://sa:cloud1688@localhost/lychee"
-    connections=10
 [web]
     addr="0.0.0.0:9808"
     version="0.1.6"
     runmode="dev"  # dev or prod
+[db]
+    pg="postgres://sa:cloud1688@localhost/lychee"
+    connections=10
 [redis]
     host="127.0.0.1"
     port="6379"
     username=""
     password=""
     with_secure=false
+[langconf]
+#There is an absolutely fail, execute shell: 'env | grep LANGUAGE'
+#'env | grep LANG' gets the language environment variables, so the configuration name cannot be "lang" or "language"
+    default="zh-CN"
+    supported=["zh-CN","en-US"]

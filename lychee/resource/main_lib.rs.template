@@ -20,20 +20,20 @@ use tera::Tera;
 use std::collections::HashMap;
 use serde_json::Value;
 use lazy_static::lazy_static;
+
+pub const CONFIG_PATH: &str = "./configs/app.toml";
 lazy_static! {
     pub static ref TRANSLATIONS: HashMap<String, Value> = {
         let mut translations = HashMap::new();
         
-        // load English translations
-        if let Ok(content) = std::fs::read_to_string("configs/locales/zh-CN.toml") {
-            if let Ok(parsed) = toml::from_str(&content) {
-                translations.insert("zh-CN".to_string(), parsed);
-            }
-        }
-        // load English translations
-        if let Ok(content) = std::fs::read_to_string("configs/locales/en-US.toml") {
-            if let Ok(parsed) = toml::from_str(&content) {
-                translations.insert("en-US".to_string(), parsed);
+        if let Ok(config) = config::Config::from_file(CONFIG_PATH) {
+            for locale in &config.langconf.supported {
+                let file_path = format!("configs/locales/{}.toml", locale);
+                if let Ok(content) = std::fs::read_to_string(&file_path) {
+                    if let Ok(parsed) = toml::from_str(&content) {
+                        translations.insert(locale.clone(), parsed);
+                    }
+                }
             }
         }
         
@@ -100,7 +100,13 @@ pub fn new(website_name:&str)->config::Config{
         }
     }
     dotenv().ok();
-    config::Config::from_file("./configs/app.toml").unwrap()
+    //config::Config::from_file(CONFIG_PATH).unwrap()
+    match config::Config::from_file(CONFIG_PATH) {
+        Ok(c) => c,
+        Err(e) => {
+            panic!("Failed to load config file at {}: {}", CONFIG_PATH, e);
+        }
+    }
 }
 
 pub async  fn handle_error(_err: io::Error) -> impl IntoResponse {

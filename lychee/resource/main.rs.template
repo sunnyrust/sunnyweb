@@ -37,6 +37,8 @@ r#"
         let web_info=config::WebHotelInfo{
                 web_addr:cfg.web.addr.clone(),
                 web_version:cfg.web.version.clone(),
+                default: cfg.langconf.default.clone(),
+                supported: cfg.langconf.supported.clone(),
         };
         let run_mode=cfg.web.runmode.clone();
         let website_name="lychee".to_string();

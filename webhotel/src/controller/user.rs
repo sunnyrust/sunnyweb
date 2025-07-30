@@ -1,5 +1,12 @@
 use crate::model::users::*;
-use crate::{AppError, AppState, Result,model::users,utils::password::PasswordHasher};
+use crate::{
+    controller::{get_app_state, get_web_info},
+    BaseController,get_translation,
+    AppError, AppState, Result,
+    model::users,
+    utils::{password::PasswordHasher,*},
+    config::WebHotelInfo
+};
 
 /// index controller
 use axum::{
@@ -12,7 +19,7 @@ use axum::{
     http::{StatusCode, header},
 };
 use sunny_derive_trait::PgCurdStruct;
-use crate::{controller::get_app_state,utils::*,BaseController,get_translation};
+use std::f64::consts::E;
 use std::sync::Arc;
 use tera::{ Context};
 use tower_sessions::{Session};
@@ -29,12 +36,17 @@ pub fn router() -> Router {
 async fn add(
     Extension(state): Extension<Arc<AppState>>,
     Extension(base_controller): Extension<BaseController>,
+    Extension(info): Extension<Arc<WebHotelInfo>>,
     session: Session
     ) -> Html<String> {
     tracing::info!("User……😀");
     let mut ctx = Context::new();
-
-    if let Some(trans) = get_translation("zh-CN") {
+    let info=get_web_info(&info);
+    let mut lang=session.get::<String>("language").await.unwrap().unwrap();
+    if lang.is_empty() {
+        lang = info.default;
+    }
+    if let Some(trans) = get_translation(&lang) {
         ctx.insert("trans", trans);
     }
     ctx.insert("action_name", "Add");
@@ -49,15 +61,17 @@ async fn add(
 async fn edit(
     Extension(state): Extension<Arc<AppState>>,
     Extension(base_controller): Extension<BaseController>,
+    Extension(info): Extension<Arc<WebHotelInfo>>,
     session: Session
     ) -> Html<String> {
     tracing::info!("User……😀");
     let mut ctx = Context::new();
-    // ctx.insert("username", "user");
-    // ctx.insert("password", "pass");
-    // let captcha_image = generate_captcha_image(session).await;
-    // ctx.insert("captcha_image", &captcha_image);
-    if let Some(trans) = get_translation("zh-CN") {
+    let info = get_web_info(&info);
+    let mut lang=session.get::<String>("language").await.unwrap().unwrap();
+    if lang.is_empty() {
+        lang = info.default;
+    }
+    if let Some(trans) = get_translation(&lang) {
         ctx.insert("trans", trans);
     }
     ctx.insert("action_name", "Edit");
@@ -83,9 +97,12 @@ pub struct UserAddForm {
 async fn do_insert(
     Extension(state): Extension<Arc<AppState>>,
     Extension(base_controller): Extension<BaseController>,
+    Extension(info): Extension<Arc<WebHotelInfo>>,
+    session: Session,
     Form(user): Form<UserAddForm>,
 ) ->  core::result::Result<Redirect, crate::utils::types::HtmlResponse> {
     tracing::info!("User Add……😀");
+
     let mut ctx = Context::new();
     let mut jump_message = message::JumpMessage {
         title: "User Add".to_string(),
@@ -95,7 +112,12 @@ async fn do_insert(
         url: "/login/test".to_string(),
         platform_token: "".to_string(),
     };
-    let trans = get_translation("zh-CN").unwrap();
+    let info = get_web_info(&info);
+    let mut lang=session.get::<String>("language").await.unwrap().unwrap();
+    if lang.is_empty() {
+        lang = info.default;
+    }
+    let trans = get_translation(&lang).unwrap();
     ctx.insert("trans", trans);
     let is_active = user.is_active.is_some();
     tracing::info!("is_active:{}", is_active);
@@ -160,11 +182,17 @@ async fn do_insert(
 async fn list(
     Extension(state): Extension<Arc<AppState>>,
     Extension(base_controller): Extension<BaseController>,
+    Extension(info): Extension<Arc<WebHotelInfo>>,
     session: Session,
 ) -> Html<String> {
     tracing::info!("User……😀");
     let mut ctx = Context::new();
-    if let Some(trans) = get_translation("zh-CN") {
+    let info= get_web_info(&info);
+    let mut lang=session.get::<String>("language").await.unwrap().unwrap();
+    if lang.is_empty() {
+        lang = info.default;
+    }
+    if let Some(trans) = get_translation(&lang ) {
         ctx.insert("trans", trans);
     }
     ctx.insert("action_name", "List");

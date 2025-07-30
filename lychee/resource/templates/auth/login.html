@@ -24,12 +24,43 @@
         .ax-form-input {
             width: 32rem;
         }
+        /* 新增语言选择器样式 */
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .language-selector select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .login {
+            position: relative;
+        }
     </style>
 </head>
 
 <body class="ax-align-origin">
 
 
+<!-- 新增语言选择器 -->
+<div class="language-selector">
+    <select id="language-select" onchange="changeLanguage(this.value)">
+        <!-- <option value="zh-CN" selected>中文</option>
+        <option value="en-US">English</option>
+        <option value="ja-JP">日本語</option>
+        <option value="ko-KR">한국어</option> -->
+        {% for lang_code in supported_languages %}
+        <option value="{{ lang_code }}" {% if lang_code == current_language %}selected{% endif %}>
+            {{ trans["theme"][lang_code] }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
 <div class="login ax-shadow-cloud ax-radius-md">
     <div class="ax-row ax-radius-md ax-split">
         <div class="ax-col ax-col-14 ax-radius-left ax-radius-md cover"></div>
@@ -117,9 +148,9 @@
                                                     <div class="ax-flex-block">
                                                         <label class="ax-checkbox"><input name="free-agree" value="0"
                                                                                           checked=""
-                                                                                          type="checkbox"><span>记住密码</span></label>
+                                                                                          type="checkbox"><span>{{trans.login.form.remember_password}}</span></label>
                                                     </div>
-                                                    <a href="###" class="ax-form-txt ax-color-ignore">忘记了密码？</a>
+                                                    <a href="###" class="ax-form-txt ax-color-ignore">{{trans.login.form.forgot_password}}?</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -272,6 +303,41 @@ document.getElementById('refresh-captcha').addEventListener('click', async funct
         });
     } catch (error) {
         console.error('CAPTCHA refresh unsuccessful.:', error);
+    }
+});
+
+
+
+function changeLanguage(lang) {
+    // 这里应该发送请求到服务器端切换语言
+    // 实际项目中，这里应该是一个API调用，例如：
+    fetch('/login/lang', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            //'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ language: lang })
+    })
+    .then(response => {
+        if(response.ok) {
+            localStorage.setItem('selected_language', lang);
+            window.location.reload(); // 重新加载页面以应用新语言
+        }
+    })
+    .catch(error => {
+        console.error('Language change failed:', error);
+    });
+    
+}
+// 初始化语言选择器，根据当前语言设置选中项
+document.addEventListener('DOMContentLoaded', function() {
+    const storedLang = localStorage.getItem('selected_language');
+    const currentLang = storedLang || document.documentElement.lang || 'zh-CN';
+    const selectElement = document.getElementById('language-select');
+    
+    if (selectElement) {
+        selectElement.value = currentLang;
     }
 });
 </script>
