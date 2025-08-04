@@ -132,7 +132,7 @@
                 <td class="td_center">{{elem.id}}</td>
                 <td class="td_title">{{elem.name}}</td>
                 <td class="td_title">
-                    {% if check_power(controller="editor", action="edit", id=1) %}
+                    {% if check_power(controller="user", action="edit", id=1) %}
                         <a href="/user/edit/id/{{ elem.id }}" class="rows_hover">{{ elem.username }}</a>
                     {% else %}
                         {{ elem.username }}

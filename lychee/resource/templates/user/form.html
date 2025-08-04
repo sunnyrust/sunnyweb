@@ -67,7 +67,7 @@
                             class="required">*</span>{{trans.common.username}}：</label>
                 <input type="hidden" name="id" value="{{user.id | default(value=0)}}"/>
                 <input type="text" name="username" id="username" value="{{user.username}}"
-                {%if  action_name != "Add" %}disabled="disabled"{% endif %} class="form_text col-13"/>
+                {%if  action_name != "Add" %}readonly="readonly"{% endif %} class="form_text col-13"/>
                 <i class="fas fa-times-circle clear-icon" id="clearIcon"></i>             
             </div>
             <div class="row">

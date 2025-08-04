@@ -2,10 +2,7 @@
 use redis::{Commands, };
 use serde::{Deserialize, Serialize};
 use super::{get_db_conn, get_redis_conn};
-use crate::{AppError,dbstate::DbState,Result,AppState};
-use std::collections::BTreeMap;
-use std::cell::{RefCell,};
-use std::collections::HashMap;
+use crate::{AppError,Result,AppState};
 use sunny_derive_trait::*;
 use sunny_derive::*;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, sqlx::FromRow,PgCurdStruct)]
@@ -130,7 +127,32 @@ pub async fn get_one<'a,'b>(state: &'a AppState,sql:&'b String) -> std::result::
                     .map_err(|e| format!("Error fetching from the database: {}", e))?;
     Ok(result)
 }
+
 #[allow(dead_code)]
+pub async fn update<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<String> {
+    let pool = get_db_conn(&state);
+    let res=sqlx::query(&sql)
+    .execute(pool)
+    .await;
+    match res {
+        Ok(result) => {
+            let _rows=result.rows_affected();
+            if _rows==0{
+                let code = AppError::from_err(format!("Error: ID not found in the database. Update aborted.").into(),crate::AppErrorType::Database);
+                return Err(code);
+            }
+        },
+        Err(err) => {
+            let code = AppError::from_err(err.into(),crate::AppErrorType::Database);
+            return Err(code);
+        }
+    }
+    // 操作redis 清除缓存
+    let client=get_redis_conn(&state);
+    let mut redis_conn = client.get_connection().expect("redis connect error");
+    let _=redis::cmd("DEL").arg(get_cache_name()).exec(&mut redis_conn);
+    Ok("ok".to_string())
+}
 /// 取得cache名字
 fn get_cache_name()->String{
     let model=Model::default();
