@@ -60,13 +60,10 @@ pub async fn login(
     ctx.insert("getversion", base_controller.app_version.as_str());
     // 验证用户名密码
     // 获取用户信息
-    let mut user_model  = users::Model::default();
+    let user_model  = users::Model::default();
     // user_model.username = form.username.clone();
     let password_hash = PasswordHasher::new().hash(form.password.clone().as_str());
-    // user_model.password_hash = form.password.clone();
-    // get_one_by_username_and_password
     let strsql= user_model.get_one_by_username_and_password(&form.username, &password_hash);
-    tracing::info!("❌SQL Query: {}❌", strsql);
     let user = users::get_one(&state, &strsql).await;
     if user.is_ok() {
         // 获取用户信息成功
@@ -139,7 +136,21 @@ async fn render_login(
     let mut ctx = Context::new();
     ctx.insert("username", "user");
     ctx.insert("password", "pass");
-    let lang=session.get::<String>("language").await.unwrap().unwrap();
+    // let lang=session.get::<String>("language").await.unwrap().unwrap();
+    let lang = match session.get::<String>("language").await {
+        Ok(Some(language)) => {
+            tracing::info!("Language retrieved from session: {}", language);
+            language
+        }
+        Ok(None) => {
+            tracing::info!("No language found in session, using default.");
+            info.default.clone() // Use the default language from info
+        }
+        Err(e) => {
+            tracing::error!("Error retrieving language from session: {:?}", e);
+            info.default.clone() // Use the default language on error as well
+        }
+    };
     tracing::info!("Login……😀---{:?}",lang);
     if lang.is_empty() {
         ctx.insert("current_language", &info.default);
@@ -199,7 +210,7 @@ async fn change_language(
     session: Session,
     axum::Json(params): axum::Json<LanguageParams>,
 ) -> impl IntoResponse {
-    // tracing::info!("Changing language to: {}✔️✔️✔️✅✅✅", params.language);
+    tracing::info!("Changing language to: {}✔️✔️✔️✅✅✅", params.language);
     session.insert("language", params.language).await.unwrap();
     // session.insert("language", "zh-CN".to_string()).await.unwrap();
     StatusCode::OK
