@@ -31,4 +31,5 @@ sunny-derive-trait = { path = "../sunny-derive-trait" }
 sunny-derive = { path = "../sunny-derive-trait/sunny-derive" }
 redis = { version = "0.32.2", features = ["tokio-comp", "cluster", "json"] }
 rust-argon2 = "2.1.0"
+regex = "1.11.1"
 

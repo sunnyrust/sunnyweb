@@ -133,7 +133,7 @@
                 <td class="td_title">{{elem.name}}</td>
                 <td class="td_title">
                     {% if check_power(controller="editor", action="edit", id=1) %}
-                        <a href="/editor/edit/id/{{ elem.id }}" class="rows_hover">{{ elem.username }}</a>
+                        <a href="/user/edit/id/{{ elem.id }}" class="rows_hover">{{ elem.username }}</a>
                     {% else %}
                         {{ elem.username }}
                     {% endif %}
@@ -141,13 +141,13 @@
                 <td>{{elem.email}}</td>
                 <td>{{elem.is_active}}</td>
                 <td>
-                    {% if check_power(controller="editor", action="edit", id=1) %}
-                        <a href="/editor/edit/id/{{ elem.id }}" class="rows_hover">📃</a>
+                    {% if check_power(controller="user", action="edit", id=1) %}
+                        <a href="/user/edit/id/{{ elem.id }}" class="rows_hover">📃</a>
                     {% endif %}
                     {% if elem.id != 1 %}
-                        {% if check_power(controller="editor", action="del", id=1) %}
+                        {% if check_power(controller="user", action="del", id=1) %}
                             <span class="td_hr">|</span>
-                            <a href="/editor/del/id/{{ elem.id }}" class="rows_hover">❌️</a>
+                            <a href="/user/del/id/{{ elem.id }}" class="rows_hover">❌️</a>
                         {% endif %}
                     {% endif %}
                 </td>
@@ -173,9 +173,9 @@
 <script type="text/javascript" src="/js/main.js?{{getversion}}"></script>
 <script type="text/javascript" src="/js/ValidateValue/ValidateValue.js"></script>
 <script>
-    function removeEditor(id) {
+    function removeUser(id) {
         if (confirm("{{trans.common.confirm_deletion}}？")) {
-            location.href = "/editor/del/id/" + id;
+            location.href = "/user/del/id/" + id;
         }
     }
 
@@ -192,7 +192,7 @@
             function hrefn(page) {
                 var name = $('#name').val();
                 var tenantcode = $('#tenantcode').val();
-                window.location.href = "/editor/list/?p=" + page + "&name=" + name + "&tenantcode=" + tenantcode;
+                window.location.href = "/user/list/?p=" + page + "&name=" + name + "&tenantcode=" + tenantcode;
             }
 
             //调用main.js的page方法
@@ -202,7 +202,7 @@
             $("#submit_form").click(function () {
                 var name = $('#name').val();
                 var tenantcode = $('#tenantcode').val();
-                window.location.href = "/editor/list/?p=" + page + "&name=" + name + "&tenantcode=" + tenantcode;
+                window.location.href = "/user/list/?p=" + page + "&name=" + name + "&tenantcode=" + tenantcode;
 
             });
         },

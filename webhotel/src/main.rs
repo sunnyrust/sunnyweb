@@ -172,11 +172,19 @@ clear_all_sessions(&pool).await.expect("Failed to clear sessions");
                     tracing::info!("-----{:?}", path_segments_lock);
                 })
                 .on_response(|response: &axum::response::Response, latency: std::time::Duration, _span: &tracing::Span| {
-                    tracing::info!(
-                        "Completed {} in {}ms",
-                        response.status(),
-                        latency.as_millis()
-                    );
+                    if response.status().is_client_error() || response.status().is_server_error() {
+                        tracing::error!(
+                            "Error response: {} in {}ms",
+                            response.status(),
+                            latency.as_millis()
+                        );
+                    }else{
+                        tracing::info!(
+                            "Completed {} in {}ms",
+                            response.status(),
+                            latency.as_millis()
+                        );
+                    }
                 })
         );
     tracing::info!("🌱🌎 服务监听于{}🌐🌱", &cfg.web.addr);
