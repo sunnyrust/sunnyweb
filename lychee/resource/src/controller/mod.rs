@@ -18,6 +18,26 @@ pub fn get_app_state<'a>(state: &'a AppState) -> &'a AppState {
 fn get_web_info<'a>(webinfo: &'a WebHotelInfo) -> WebHotelInfo{
    webinfo.to_owned()
 }
+
+#[allow(dead_code)]
+async fn get_language(info: &WebHotelInfo, session: tower_sessions::Session) -> serde_json::Value {
+   let info = get_web_info(&info);
+   let lang = match session.get::<String>("language").await {
+        Ok(Some(language)) => {
+            tracing::info!("Language retrieved from session: {}", language);
+            language
+        }
+        Ok(None) => {
+            tracing::info!("No language found in session, using default.");
+            info.default.clone() // Use the default language from info
+        }
+        Err(e) => {
+            tracing::error!("Error retrieving language from session: {:?}", e);
+            info.default.clone() // Use the default language on error as well
+        }
+    };
+    crate::get_translation(&lang).unwrap().clone()
+}
 #[allow(dead_code)]
 /// 渲染模板
 fn render<T: Template>(tpl: T, handler_name: &str) -> Result<super::utils::types::HtmlResponse> {

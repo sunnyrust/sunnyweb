@@ -353,7 +353,7 @@ async fn do_delete(
     ctx.insert("jump_message", &jump_message);
     let mut user_model  = users::Model::default();
     user_model.id = id;
-    users::delete(&state, &user_model.delete(id)).await.unwrap_or_else(|_| ());
+    users::delete(&state, &user_model.delete(id)).await.unwrap();
     Ok(Redirect::to("/user/list"))
 }
 /// List users

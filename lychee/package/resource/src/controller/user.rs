@@ -1,6 +1,6 @@
 use crate::model::users::*;
 use crate::{
-    controller::{get_app_state, get_web_info},
+    controller::{get_app_state, get_web_info,get_language},
     BaseController,get_translation,
     AppError, AppState, Result,
     model::users,
@@ -32,6 +32,7 @@ pub fn router() -> Router {
         // .route("/add", post(insert_one))
         .route("/list", get(list))
         .route("/edit/id/{id}", get(edit).post(do_update))
+        .route("/del/id/{id}", get(do_delete))
 }
 
 async fn add(
@@ -249,24 +250,25 @@ async fn do_update(
         url: "/login/test".to_string(),
         platform_token: "".to_string(),
     };
-    let info = get_web_info(&info);
+    // let info = get_web_info(&info);
 
-    let lang = match session.get::<String>("language").await {
-        Ok(Some(language)) => {
-            tracing::info!("Language retrieved from session: {}", language);
-            language
-        }
-        Ok(None) => {
-            tracing::info!("No language found in session, using default.");
-            info.default.clone() // Use the default language from info
-        }
-        Err(e) => {
-            tracing::error!("Error retrieving language from session: {:?}", e);
-            info.default.clone() // Use the default language on error as well
-        }
-    };
-    let trans = get_translation(&lang).unwrap();
-    ctx.insert("trans", trans);
+    // let lang = match session.get::<String>("language").await {
+    //     Ok(Some(language)) => {
+    //         tracing::info!("Language retrieved from session: {}", language);
+    //         language
+    //     }
+    //     Ok(None) => {
+    //         tracing::info!("No language found in session, using default.");
+    //         info.default.clone() // Use the default language from info
+    //     }
+    //     Err(e) => {
+    //         tracing::error!("Error retrieving language from session: {:?}", e);
+    //         info.default.clone() // Use the default language on error as well
+    //     }
+    // };
+    // let trans = get_translation(&lang).unwrap();
+    let trans = get_language(&info,session).await;
+    ctx.insert("trans", &trans);
     let is_active = user.is_active.is_some();
     ctx.insert("getversion", base_controller.app_version.as_str());
     let state = get_app_state(&state);
@@ -328,6 +330,32 @@ async fn do_update(
     
 }
 
+/// Delete a user
+async fn do_delete(
+    Extension(state): Extension<Arc<AppState>>,
+    Extension(base_controller): Extension<BaseController>,
+    Extension(info): Extension<Arc<WebHotelInfo>>,
+    session: Session,
+    Path(id): Path<i32>,
+) ->  core::result::Result<Redirect, crate::utils::types::HtmlResponse> {
+    tracing::info!("User Delete……😀");
+    let mut ctx = Context::new();
+    let mut jump_message = message::JumpMessage {
+        title: "User Delete".to_string(),
+        staus: true,
+        wait: 3,
+        message: "Success".to_string(),
+        url: "/user/list".to_string(),
+        platform_token: "".to_string(),
+    };
+    let trans = get_language(&info,session).await;
+    ctx.insert("trans", &trans);
+    ctx.insert("jump_message", &jump_message);
+    let mut user_model  = users::Model::default();
+    user_model.id = id;
+    users::delete(&state, &user_model.delete(id)).await.unwrap();
+    Ok(Redirect::to("/user/list"))
+}
 /// List users
 async fn list(
     Extension(state): Extension<Arc<AppState>>,

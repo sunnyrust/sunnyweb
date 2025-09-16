@@ -52,6 +52,32 @@ async fn have_name<'a,'b,'c>(state: &'a AppState,table_name:&'b String,name:&'c 
      }
      Ok(b)
  }
+ #[allow(dead_code)]
+pub async fn delete<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<String> {
+    let pool = get_db_conn(&state);
+    //let sql=format!("Delete from {} where id ={}",get_table_name(),id);
+    let res=sqlx::query(&sql)
+    .execute(pool)
+    .await;
+    match res {
+        Ok(result) => {
+            let _rows=result.rows_affected();
+            if _rows==0{
+                let code = AppError::from_err(format!("Can't delete because this ID does not exist").into(),crate::AppErrorType::Database);
+                return Err(code);
+            }
+        },
+        Err(err) => {
+            let code = AppError::from_err(err.into(),crate::AppErrorType::Database);
+            return Err(code);
+        }
+    }
+    // 操作redis 清除缓存
+    let client=get_redis_conn(&state);
+    let mut redis_conn = client.get_connection().expect("redis connect error");
+    redis::cmd("DEL").arg(get_cache_name()).execute(&mut redis_conn);
+    Ok("ok".to_string())
+}
 
 #[allow(dead_code)]
 pub async fn insert_one<'a,'b,'c,'d>(state: &'a AppState,sql:&'b String,table_name:&'c String,name:&'d  String) -> Result<String> {
@@ -153,6 +179,7 @@ pub async fn update<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<String>
     let _=redis::cmd("DEL").arg(get_cache_name()).exec(&mut redis_conn);
     Ok("ok".to_string())
 }
+
 /// 取得cache名字
 fn get_cache_name()->String{
     let model=Model::default();
