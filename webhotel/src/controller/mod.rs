@@ -1,6 +1,7 @@
 pub mod login;
 pub mod index;
 pub mod user;
+pub mod navigation;
 use crate::{AppState,AppError,Result,config::WebHotelInfo};
 
 use askama::Template;
@@ -47,6 +48,7 @@ fn render<T: Template>(tpl: T, handler_name: &str) -> Result<super::utils::types
        .map_err(log_error(handler_name))?;
    Ok(Html(out))
 }
+
 #[allow(dead_code)]
 /// 记录错误
 fn log_error(handler_name: &str) -> Box<dyn Fn(AppError) -> AppError> {
