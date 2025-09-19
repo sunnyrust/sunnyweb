@@ -49,7 +49,7 @@ pub async fn login(
     tracing::info!(message);
     let mut jump_message = message::JumpMessage {
         title: "Login".to_string(),
-        staus: true,
+        status: true,
         wait: 3,
         message: "登录成功".to_string(),
         url: "/login/test".to_string(),
@@ -78,7 +78,7 @@ pub async fn login(
         ctx.insert("captcha_image", &captcha_image);
         if let Some(trans) = get_translation("en-US") {
             ctx.insert("trans", trans);
-            jump_message.staus = false;
+            jump_message.status = false;
             jump_message.message = trans["login"]["form"]["login_error"].to_string();
             jump_message.url = "/login/login".to_string();
         }
@@ -97,7 +97,7 @@ pub async fn login(
         ctx.insert("captcha_image", &captcha_image);
         if let Some(trans) = get_translation("en-US") {
             ctx.insert("trans", trans);
-            jump_message.staus = false;
+            jump_message.status = false;
             jump_message.message = trans["login"]["form"]["captcha_error"].to_string();
             jump_message.url = "/login/login".to_string();
         }

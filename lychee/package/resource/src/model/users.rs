@@ -75,7 +75,7 @@ pub async fn delete<'a,'b>(state: &'a AppState,sql:&'b String) -> Result<String>
     // 操作redis 清除缓存
     let client=get_redis_conn(&state);
     let mut redis_conn = client.get_connection().expect("redis connect error");
-    redis::cmd("DEL").arg(get_cache_name()).execute(&mut redis_conn);
+    redis::cmd("DEL").arg(get_cache_name()).exec(&mut redis_conn);
     Ok("ok".to_string())
 }
 

@@ -111,7 +111,7 @@ async fn edit(
             tracing::error!("Error retrieving editor: {:?}", e);
             let jump_message = message::JumpMessage {
                 title: "User Edit".to_string(),
-                staus: false,
+                status: false,
                 wait: 3,
                 message: e.to_string(),
                 url: "/user/list".to_string(),
@@ -146,12 +146,12 @@ async fn do_insert(
     session: Session,
     Form(user): Form<UserAddForm>,
 ) ->  core::result::Result<Redirect, crate::utils::types::HtmlResponse> {
-    tracing::info!("User Add……😀");
+    // tracing::info!("User Add……😀");
 
     let mut ctx = Context::new();
     let mut jump_message = message::JumpMessage {
         title: "User Add".to_string(),
-        staus: true,
+        status: true,
         wait: 3,
         message: "Success".to_string(),
         url: "/login/test".to_string(),
@@ -180,14 +180,14 @@ async fn do_insert(
     ctx.insert("getversion", base_controller.app_version.as_str());
     let state = get_app_state(&state);
     if user.password!=user.re_password {
-        jump_message.staus = false;
+        jump_message.status = false;
         jump_message.message = trans["editor"]["passwordMatch"].to_string();
         jump_message.url = "/user/add".to_string();
         ctx.insert("jump_message", &jump_message);
         return Err(super::webhotel_render(state.tera.clone(), ctx, "common/message.html"));
     }
     if user.username.is_empty() {
-        jump_message.staus = false;
+        jump_message.status = false;
         jump_message.message = trans["editor"]["form"]["username_empty_error"].to_string();
         jump_message.url = "/user/add".to_string();
         ctx.insert("jump_message", &jump_message);
@@ -206,12 +206,12 @@ async fn do_insert(
         let res = users::insert_one(&state, &user_model.insert(),&user_model.get_table_name().to_string(),&user.username).await;
         match res {
             Ok(_) => {
-                jump_message.staus = true;
+                jump_message.status = true;
                 jump_message.message = String::from("Ok");
                 jump_message.url = "/user/list".to_string();
             }
             Err(err) => {
-                jump_message.staus = false;
+                jump_message.status = false;
                 let _msg = match err.error {
                     crate::err::AppErrorItem::Cause(err) => err.to_string(),
                     crate::err::AppErrorItem::Message(msg) => msg.unwrap_or("发生错误".to_string()),
@@ -222,7 +222,7 @@ async fn do_insert(
                 
             }
         }
-        if jump_message.staus {
+        if jump_message.status {
             ctx.insert("jump_message", &jump_message);
             return Ok(Redirect::to("/user/list"));
         } else {
@@ -244,7 +244,7 @@ async fn do_update(
     let mut ctx = Context::new();
     let mut jump_message = message::JumpMessage {
         title: "User Update".to_string(),
-        staus: true,
+        status: true,
         wait: 3,
         message: "Success".to_string(),
         url: "/login/test".to_string(),
@@ -273,7 +273,7 @@ async fn do_update(
     ctx.insert("getversion", base_controller.app_version.as_str());
     let state = get_app_state(&state);
     if user.password!=user.re_password {
-        jump_message.staus = false;
+        jump_message.status = false;
         jump_message.message = trans["editor"]["passwordMatch"].to_string();
         jump_message.url = format!("/user/edit/id/{}", user.id.unwrap());
         ctx.insert("jump_message", &jump_message);
@@ -303,12 +303,12 @@ async fn do_update(
     let res = users::update(&state, &str_sql).await;
     match res {
         Ok(_) => {
-            jump_message.staus = true;
+            jump_message.status = true;
             jump_message.message = String::from("Ok");
             jump_message.url = "/user/list".to_string();
         }
         Err(err) => {
-            jump_message.staus = false;
+            jump_message.status = false;
             let _msg = match err.error {
                 crate::err::AppErrorItem::Cause(err) => err.to_string(),
                 crate::err::AppErrorItem::Message(msg) => msg.unwrap_or("发生错误".to_string()),
@@ -319,7 +319,7 @@ async fn do_update(
 
         }
     }
-    if jump_message.staus {
+    if jump_message.status {
         ctx.insert("jump_message", &jump_message);
         return Ok(Redirect::to("/user/list"));
     } else {
@@ -340,9 +340,9 @@ async fn do_delete(
 ) ->  core::result::Result<Redirect, crate::utils::types::HtmlResponse> {
     tracing::info!("User Delete……😀");
     let mut ctx = Context::new();
-    let mut jump_message = message::JumpMessage {
+    let jump_message = message::JumpMessage {
         title: "User Delete".to_string(),
-        staus: true,
+        status: true,
         wait: 3,
         message: "Success".to_string(),
         url: "/user/list".to_string(),

@@ -1,5 +1,6 @@
 pub mod users;
-use crate::{dbstate::DbState,AppState,err::AppError,Result};
+pub mod navigation;
+use crate::{AppState,err::AppError,Result};
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 #[allow(dead_code)]
