@@ -18,6 +18,7 @@ pub struct Model {
     pub id: i32,
     pub name: String,
     pub pid: i32,
+    pub is_display: bool,
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, sqlx::FromRow)]
 pub struct NavigationModel {
@@ -26,10 +27,11 @@ pub struct NavigationModel {
     pub pid: i32,
     pub level:i64,
     pub is_parent:bool,
+    pub is_display: bool,
 }
 impl NavigationModel {
-    pub fn new(id:i32,name:String,pid:i32,level:i64,is_parent:bool) -> NavigationModel{
-        NavigationModel {id, name, pid, level,is_parent}
+    pub fn new(id:i32,name:String,pid:i32,level:i64,is_parent:bool,is_display:bool) -> NavigationModel{
+        NavigationModel {id, name, pid, level,is_parent,is_display}
     }
     // 递归遍历方法
     pub fn traverse(&self, node_map: &HashMap<i32, NavigationModel>, ids: &mut Vec<i32>) {
@@ -51,6 +53,7 @@ pub struct NavigationNode<'a> {
     pub childs: Vec<&'a RefCell<NavigationNode<'a>>>,
     pub level:i64,
     pub is_parent:bool,
+    pub is_display:bool,
 }
 
 impl<'a> NavigationNode<'a> {
@@ -62,7 +65,7 @@ impl<'a> NavigationNode<'a> {
             indent.push_str(" ");
         }
 
-        println!("{}- id: {}, name: {},pid:{},level:{}", indent, self.id, self.name,self.parent_id,self.level);
+        println!("{}- id: {}, name: {},pid:{},level:{},is_display:{}", indent, self.id, self.name,self.parent_id,self.level,self.is_display);
 
         for child in self.childs.iter() {
             child.borrow().print_node(depth + 1);
@@ -71,7 +74,7 @@ impl<'a> NavigationNode<'a> {
 
     /// 把node转化为NavigationModel
     pub fn set_node_to_model(&self, depth: i64,navigation_model:&mut  Vec<NavigationModel>) {
-        let tm=NavigationModel{id:self.id,name:self.name.clone(),pid:self.parent_id,level:self.level,is_parent:self.is_parent};
+        let tm=NavigationModel{id:self.id,name:self.name.clone(),pid:self.parent_id,level:self.level,is_parent:self.is_parent,is_display:self.is_display};
         navigation_model.push(tm);
         for child in self.childs.iter() {
             child.borrow_mut().set_node_to_model(depth + 1,navigation_model);
@@ -87,7 +90,7 @@ impl<'a> NavigationNode<'a> {
 
 #[allow(dead_code)]
 pub(crate) fn get_table_name()->&'static str{
-    "sunny_rbac.navigation"
+    "lychee_rbac.navigation"
 }
 
 #[allow(dead_code)]
@@ -96,9 +99,9 @@ pub async fn get_all_tag<'a,'b>(state: &'a AppState,order:Option<&'b str>) -> Re
     #[allow(unused_assignments)]
     let mut sql=String::new();
     if str_order.len()==0{
-        sql=format!("SELECT id, name,pid from {}",get_table_name());
+        sql=format!("SELECT id, name,pid,is_display from {}",get_table_name());
     }else{
-        sql=format!("SELECT id, name,pid from {} order by {}",get_table_name(),str_order);
+        sql=format!("SELECT id, name,pid,is_display from {} order by {}",get_table_name(),str_order);
     }
     let pool = get_db_conn(&state);
     
@@ -113,7 +116,7 @@ pub async fn get_all_tag<'a,'b>(state: &'a AppState,order:Option<&'b str>) -> Re
 pub async fn get_one_by_id<'a,'b>(state: &'a AppState,id:i32) -> std::result::Result<Model,String> {
     #[allow(unused_assignments)]
     let mut sql=String::new();
-    sql=format!("SELECT id, name,pid from {} where id ={}",get_table_name(),id);
+    sql=format!("SELECT id, name,pid,is_display from {} where id ={}",get_table_name(),id);
     let pool = get_db_conn(&state);
     let rows = sqlx::query_as::<_, Model>(&sql)
         .fetch_one(pool)
@@ -141,7 +144,7 @@ pub async fn get_navigation_tree<'a>(state: &'a AppState) -> Result<Vec<Navigati
     let mut  navigation_models:Vec<NavigationModel>= vec![];
     if !b_have_key{
         let pool = get_db_conn(&state);
-        let  mut sql=format!("SELECT id, name,pid from {} where id<>0;",get_table_name());
+        let  mut sql=format!("SELECT id, name,pid,is_display from {} where id<>0;",get_table_name());
         let rows = sqlx::query_as::<_, Model>(&sql)
             .fetch_all(pool)
             .await
@@ -163,7 +166,7 @@ pub async fn get_navigation_tree<'a>(state: &'a AppState) -> Result<Vec<Navigati
                     break;
                 }
             }
-            let node=NavigationNode{id: row.id, name: row.name, parent_id: row.pid, childs: Vec::new(),level:0,is_parent:bpid};
+            let node=NavigationNode{id: row.id, name: row.name, parent_id: row.pid,is_display: row.is_display, childs: Vec::new(),level:0,is_parent:bpid};
             nodes.insert(node.id, RefCell::new(node.clone()));
         }
         let mut tree: Vec<&RefCell<NavigationNode>> = Vec::new();
@@ -262,7 +265,7 @@ async fn is_parent<'a>(state: &'a AppState,id:i32) ->Result<bool>{
 #[allow(dead_code)]
 pub async fn update<'a>(state: &'a AppState,m:Model) -> Result<String> {
     let pool = get_db_conn(&state);
-    let sql=format!("UPDATE {} SET name = '{}',pid = {} WHERE id = {};",get_table_name(),m.name,m.pid,m.id);
+    let sql=format!("UPDATE {} SET name = '{}',pid = {},is_display = {} WHERE id = {};",get_table_name(),m.name,m.pid,m.is_display,m.id);
     let res=sqlx::query(&sql)
     .execute(pool)
     .await;
@@ -317,7 +320,7 @@ pub async fn insert_one<'a>(state: &'a AppState,m:Model) -> Result<String> {
         let code = AppError::from_err(format!("name:{}已经存在，不能添加",m.name.clone()).into(),crate::AppErrorType::Database);
         return Err(code);
     }
-    let sql=format!("insert into {}(pid,name) VALUES({},'{}') ",get_table_name(),m.pid,m.name);
+    let sql=format!("insert into {}(pid,name,is_display) VALUES({},'{}',{}) ",get_table_name(),m.pid,m.name,m.is_display);
     let res=sqlx::query(&sql)
     .execute(pool)
     .await;
