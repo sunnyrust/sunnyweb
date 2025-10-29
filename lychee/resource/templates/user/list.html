@@ -142,12 +142,12 @@
                 <td>{{elem.is_active}}</td>
                 <td>
                     {% if check_power(controller="user", action="edit", id=1) %}
-                        <a href="/user/edit/id/{{ elem.id }}" class="rows_hover">📃</a>
+                        <a href="/user/edit/id/{{ elem.id }}" class="del rows_hover">📃</a>
                     {% endif %}
                     {% if elem.id != 1 %}
                         {% if check_power(controller="user", action="del", id=1) %}
                             <span class="td_hr">|</span>
-                            <a href="/user/del/id/{{ elem.id }}" class="rows_hover">❌️</a>
+                            <a href="javascript:void(0)" onclick="removeUser('{{ elem.id }}')" class="del rows_hover">❌️</a>
                         {% endif %}
                     {% endif %}
                 </td>
@@ -173,10 +173,13 @@
 <script type="text/javascript" src="/js/main.js?{{getversion}}"></script>
 <script type="text/javascript" src="/js/ValidateValue/ValidateValue.js"></script>
 <script>
+  
     function removeUser(id) {
         if (confirm("{{trans.common.confirm_deletion}}？")) {
             location.href = "/user/del/id/" + id;
+            return true;
         }
+        return false;
     }
 
     let user = null

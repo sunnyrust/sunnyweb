@@ -19,7 +19,7 @@
   <div style="display: flex;">
     <div style="flex: 0 0 30%; ">
       <!-- 左边内容 -->
-      <form id="edit_form" name="form" method="post" action="/tag/doedit">
+      <form id="edit_form" name="form" method="post" action="/navigation/doedit">
         <input type="hidden" id="id" name="id" value="{{id}}" readonly="readonly" />
         <input type="hidden" id="pid" name="pid" value="{{pid}}" readonly="readonly" />
         <div id="jstree" style="flex: 1;">
@@ -32,7 +32,10 @@
           </ul>
         </div>
         <label for="name">name:</label> <input type="text" id="name" name="name" value="{{name}}" />
+        <label for="is_display">是否显示:</label>
+        <input type="checkbox" id="is_display" name="is_display"  {%if is_display %}checked{% endif %}/>
         <input type="submit" value="提交" />
+        <input type="button" value="Cancel" onclick="cancelForm()" />
       </form>
     </div>
     <!-- 3 setup a container element -->
@@ -73,8 +76,8 @@
       $('#jstree').jstree('select_node', 'tree_{{pid}}');
 
       $('#edit_form').on("submit", function (e) {
-       
-        if (($('#pid').val()=={{pid}}) && ($('#name').val()=="{{name}}")){
+
+        if (($('#pid').val()=={{pid}}) && ($('#name').val()=="{{name}}") && ($('#is_display').is(':checked')=={{is_display|lower}})) {
           alert('The data is not modify!');
         }else{
           $('#edit_form').submit();
@@ -82,6 +85,14 @@
         e.preventDefault(); // cancel the actual submit
       });
     });
+
+    function cancelForm() {
+      // 重置表单
+      //document.getElementById('edit_form').reset();
+      // 或者重定向到其他页面
+      window.location.href = '/navigation/list';
+      // 或者只是关闭/隐藏表单（根据你的需求）
+    }
   </script>
 </body>
 

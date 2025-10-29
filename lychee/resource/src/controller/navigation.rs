@@ -17,15 +17,15 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tower_http::trace::TraceLayer;
-pub(crate) fn index_router() -> Router {
+pub(crate) fn router() -> Router {
     Router::new()
         .route("/list", get(list))
         .route("/tree", get(get_tree))
-        .route("/find/:id", get(get_one))
-        .route("/edit/:id", get(edit))
+        .route("/find/{id}", get(get_one))
+        .route("/edit/{id}", get(edit))
         .route("/doedit", post(do_edit))
         .route("/add", get(add).post(do_add))
-        .route("/del/:id", get(do_del))
+        .route("/del/{id}", get(do_del))
         .layer(TraceLayer::new_for_http())
 }
 
@@ -153,6 +153,7 @@ pub struct EditForm<'a, 'b> {
     pub id: i32,
     pub pid: i32,
     pub name: &'b str,
+    pub is_display: bool,
 }
 pub async fn edit(
     Extension(state): Extension<Arc<AppState>>,
@@ -172,6 +173,7 @@ pub async fn edit(
             pid: 0,
             level: -9,
             is_parent: true,
+            is_display: true,
         },
     };
     if tag_root.level == -9 {
@@ -206,12 +208,14 @@ pub async fn edit(
             id: 0,
             name: "".to_string(),
             pid: 0,
+            is_display: false,
         });
         let tpl = EditForm {
             ul: &str_html,
             id: id,
             pid: m.pid,
             name: &m.name,
+            is_display: m.is_display,
         };
         super::render(tpl, handler_name)
     }
@@ -233,6 +237,7 @@ fn judge_push(stack: &Stack<NavigationModel>, tml: &NavigationModel) -> bool {
             pid: 0,
             level: -9,
             is_parent: true,
+            is_display: true,
         },
     };
     if o.level == -9 {
@@ -254,9 +259,13 @@ fn set_html(stack: &mut Stack<NavigationModel>, tml: &NavigationModel, html: Str
     let mut s = String::new();
     if judge_push(&stack, &tml) {
         if have_link {
+            let mut display="👁︎".to_string();
+            if !tml.is_display {
+                display="🚫".to_string();
+            }
             s = format!(
-                "<ul><li id='tree_{}' pid='{}'><a href='./edit/{}'>{}</a>",
-                tml.id, tml.pid, tml.id, tml.name
+                "<ul><li id='tree_{}' pid='{}'><a href='./edit/{}'>{}{}</a>",
+                tml.id, tml.pid, tml.id, tml.name,display
             );
         } else {
             s = format!(
@@ -277,9 +286,13 @@ fn set_html(stack: &mut Stack<NavigationModel>, tml: &NavigationModel, html: Str
                 str_html += r#"</ul>"#;
             }
             if have_link {
+                let mut display="👁︎".to_string();
+                if !tml.is_display {
+                    display="🚫".to_string();
+                }
                 s = format!(
-                    "<li id='tree_{}' pid='{}'><a href='./edit/{}'>{}</a>",
-                    tml.id, tml.pid, tml.id, tml.name
+                    "<li id='tree_{}' pid='{}'><a href='./edit/{}'>{}{}</a>",
+                    tml.id, tml.pid, tml.id, tml.name,display
                 );
             } else {
                 s = format!("<li id='tree_{}' pid='{}'>{}", tml.id, tml.pid, tml.name);
@@ -297,6 +310,7 @@ pub struct EditStruct {
     pub id: i32,
     pub pid: i32,
     pub name: String,
+    pub is_display: Option<String>,
 }
 
 pub async fn do_edit(
@@ -318,6 +332,7 @@ pub async fn do_edit(
             id: frm.id,
             name: frm.name.clone(),
             pid: frm.pid,
+            is_display: frm.is_display.is_some(),
         },
     )
     .await;
@@ -379,6 +394,7 @@ pub struct AddFormTemplate<'a, 'b> {
     pub id: i32,
     pub pid: i32,
     pub name: &'b str,
+    pub is_display: bool,
 }
 pub async fn add(
     Extension(state): Extension<Arc<AppState>>
@@ -404,6 +420,7 @@ pub async fn add(
         id: -1,
         pid: 0,
         name: "",
+        is_display: true,
     };
     render(tpl, handler_name)
 }
@@ -413,6 +430,7 @@ pub struct AddStruct {
     pub id: i32,
     pub pid: i32,
     pub name: String,
+    pub is_display: Option<String>,
 }
 pub async fn do_add(
     Extension(state): Extension<Arc<AppState>>,
@@ -434,6 +452,7 @@ pub async fn do_add(
             id: frm.id,
             name: frm.name.clone(),
             pid: frm.pid,
+            is_display: frm.is_display.is_some(),
         },
     )
     .await;

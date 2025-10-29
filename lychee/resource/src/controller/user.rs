@@ -176,7 +176,7 @@ async fn do_insert(
     let trans = get_translation(&lang).unwrap();
     ctx.insert("trans", trans);
     let is_active = user.is_active.is_some();
-    tracing::info!("is_active:{}", is_active);
+    // tracing::info!("is_active:{}", is_active);
     ctx.insert("getversion", base_controller.app_version.as_str());
     let state = get_app_state(&state);
     if user.password!=user.re_password {

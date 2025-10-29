@@ -64,11 +64,37 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL    --password
 );
 ```
+
+postgresql
+```sql
+CREATE TABLE lychee_rbac.users( 
+    id serial PRIMARY KEY     NOT NULL,
+    name VARCHAR(50)    NOT NULL,
+    password_hash  VARCHAR(100)    NOT NULL,
+    email VARCHAR(80),
+    username VARCHAR(50),
+    description VARCHAR(500),
+    is_active boolean DEFAULT true
+) ;
+
+CREATE INDEX IF NOT EXISTS pwd
+    ON lychee_rbac.users USING btree
+    (name COLLATE pg_catalog."default" bpchar_pattern_ops ASC NULLS LAST)
+    INCLUDE(name, password_hash)
+    WITH (deduplicate_items=True)
+    TABLESPACE pg_default;
+
+```
 Initially, I wanted to use the MD5.
 But I found that it is not secure enough.Recently, MD5 has been recognized as an insufficiently secure hashing algorithm because it is vulnerable to collision attacks.
 In practice, it is recommended to use a more secure hash algorithm such as argon2 or bcrypt.
 
 I use sqlx  to connect to the database.
+### create database navigation
+I use it to store the menu information.
+```sql
+```
+This data table stores all the menu functions of the website.
 ### create a little tool
 Because there is no linux tool like md5sum.I will write a little tool to generate the hash value.
 I named it sunny_bcrypt.
